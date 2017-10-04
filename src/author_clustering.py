@@ -3,13 +3,12 @@ Author: Guillermo Alonso
 
 In this module we will explore author clustering. Note that at first I will
 be reading the data from the ``.csv`` files instead of the sqlite database.
-
-It is assumed that the ``.csv`` files exist within the same folder than this
-script.
 """
 from collections import defaultdict
-
 import csv
+import numpy as np
+
+from sklearn.cluster import KMeans
 
 # Key: author id. Value: Author name
 author_names = {}
@@ -39,7 +38,7 @@ with open('../nips-data/paper_authors.csv', 'r') as csv_file:
 # Check data validity
 assert len(author_names) == len(author_papers)
 
-print('Dictionaries filled OK')
+print('Internal dictionaries filled OK')
 
 print('Let us take a look at some information from the dataset')
 paper_lengths = [len(papers) for papers in author_papers.values()]
@@ -47,3 +46,23 @@ print('The minimum number of papers by an author is:', min(paper_lengths))
 print('The maximum number of papers by an author is:', max(paper_lengths))
 print('The average number of papers of the authors is:',
       sum(paper_lengths)/len(paper_lengths))
+
+
+# Construct a ndarray. For that, we need a list of lists, so that each sublists
+# represent the information of each author (as of now, only the number of
+# papers)
+np_array_lengths = np.array([[length] for length in paper_lengths])
+
+CLUSTER_COUNT = 4
+
+print('Applying K-means with K = {} ...'.format(CLUSTER_COUNT))
+
+estimator = KMeans(n_clusters=CLUSTER_COUNT)
+kmeans = estimator.fit(np_array_lengths)
+
+print('Centers for the centroids:')
+print(kmeans.cluster_centers_)
+
+unique, counts = np.unique(kmeans.labels_, return_counts=True)
+print('Number of authors belonging to each cluster:',
+      dict(zip(unique, counts)))
