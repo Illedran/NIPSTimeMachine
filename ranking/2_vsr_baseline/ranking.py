@@ -9,7 +9,8 @@ class BasicVSRanker:
     @staticmethod
     def from_tokenized(texts, prepr=Preprocessor()):
         vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
-        vectorized_texts = vectorizer.fit_transform([" ".join(text) for text in texts])
+        vectorized_texts = vectorizer.fit_transform(
+            [" ".join(text) for text in texts])
 
         ranker = BasicVSRanker()
         ranker.vectorizer = vectorizer
@@ -26,7 +27,9 @@ class BasicVSRanker:
     def best_n_matches(self, query, n=10):
         query = self.prepr.process(query)
         query = self.vectorizer.transform(query)
-        return np.argsort(-cosine_similarity(query, self.vectorized_texts)).flatten()[:n]
+        return np.argsort(
+            -cosine_similarity(query, self.vectorized_texts)
+        ).flatten()[:n]
 
     def rank(self, query):
         query = self.prepr.process(query)
