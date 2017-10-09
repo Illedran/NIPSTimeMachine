@@ -27,3 +27,8 @@ class BasicVSRanker:
         query = self.prepr.process(query)
         query = self.vectorizer.transform(query)
         return np.argsort(-cosine_similarity(query, self.vectorized_texts)).flatten()[:n]
+
+    def rank(self, query):
+        query = self.prepr.process(query)
+        query = self.vectorizer.transform(query)
+        return cosine_similarity(query, self.vectorized_texts).flatten()
