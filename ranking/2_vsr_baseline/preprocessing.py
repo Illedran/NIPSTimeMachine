@@ -1,19 +1,19 @@
 import nltk
 
-#Uses NLTK word_toknizer, with alnum token filtration and conversion to lower case.
+#Uses NLTK word_toknizer, with conversion to lower case.
 class BasicTokenizer:
 
 	def tokenize(self, text):
-		return [t for t in nltk.word_tokenize(text.lower()) if t.isalnum()]
+		return [t for t in nltk.word_tokenize(text.lower())]
 
 #Filters out stopwords from NLTK english stopword list
-class StopwordFilter:
+class BasicFilter:
 
 	def __init__(self):
 		self.stopwords = set(nltk.corpus.stopwords.words('english'))
 
 	def filt(self, tokens):
-		return [t for t in tokens if not t in self.stopwords]
+		return [t for t in tokens if not t in self.stopwords and len(t) > 1 and t.isalnum()]
 
 #Stemmer that does nothing
 class NoStemmer:
@@ -33,7 +33,7 @@ class Preprocessor:
 
 	def __init__(self):
 		self.tokenizer = BasicTokenizer()
-		self.filter = StopwordFilter()
+		self.filter = BasicFilter()
 		self.stemmer = SnowballStemmer()
 
 	def process(self, text):
