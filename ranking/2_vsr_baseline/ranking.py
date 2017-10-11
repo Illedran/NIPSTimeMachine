@@ -16,22 +16,23 @@ class BasicVSRanker:
         ranker.vectorizer = vectorizer
         ranker.vectorized_texts = vectorized_texts
         ranker.prepr = prepr
+        ranker.similarity_function = cosine_similarity
 
         return ranker
 
     @staticmethod
     def from_raw(texts, prepr=Preprocessor()):
         tokenized = prepr.process_texts(texts)
-        return BasicVSRanker.from_tokenized(tokenized)
+        return BasicVSRanker.from_tokenized(tokenized, prepr)
 
-    def best_n_matches(self, query, n=10):
+    def get_best_matches(self, query, n=10):
         query = self.prepr.process(query)
-        query = self.vectorizer.transform(query)
+        query = self.vectorizer.transform([" ".join(query)])
         return np.argsort(
-            -cosine_similarity(query, self.vectorized_texts)
+            -self.similarity_function(query, self.vectorized_texts)
         ).flatten()[:n]
 
-    def rank(self, query):
+    def get_scores(self, query):
         query = self.prepr.process(query)
-        query = self.vectorizer.transform(query)
-        return cosine_similarity(query, self.vectorized_texts).flatten()
+        query = self.vectorizer.transform([" ".join(query)])
+        return self.similarity_function(query, self.vectorized_texts)
