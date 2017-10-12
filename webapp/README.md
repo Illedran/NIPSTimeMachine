@@ -1,7 +1,11 @@
 ## Install dependences
 
-**pip install -r requirements.txt**
+```
+pip install -r requirements.txt
+```
 
 ## Run application
 
-**python app.py**
+```
+python app.py
+```
