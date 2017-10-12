@@ -39,9 +39,12 @@ with open('../nips-data/authors.csv', 'r') as csv_file:
 
 # We have to narrow it down to just one author
 unique_authors = list(set(author_variety))
-if (len(unique_authors) != 1):
+
+if len(unique_authors) == 0:
+  sys.exit('Could not find any author named "{}"'.format(q))
+if len(unique_authors) > 1:
   potential_authors = ', '.join(unique_authors)
-  sys.exit('Did you mean one of these: ' + potential_authors)
+  sys.exit('Different authors found. Did you mean one of these: ' + potential_authors)
 
 for relevant_author in relevant_authors:
   with open('../nips-data/paper_authors.csv', 'r') as csv_file:
