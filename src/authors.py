@@ -8,8 +8,6 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.stem.porter import PorterStemmer
 from stop_words import get_stop_words
 
-tokenizer = RegexpTokenizer(r'\w+')
-en_stop = get_stop_words('en')
 q = 'Michael I. Jordan'
 
 
@@ -99,6 +97,8 @@ def get_author_texts_and_years(relevant_papers):
 
 def get_text_keywords_sanitized(author_texts):
   texts = []
+  tokenizer = RegexpTokenizer(r'\w+')
+  en_stop = get_stop_words('en')
 
   # LDA topic extraction
   # Remove stop words and stem
