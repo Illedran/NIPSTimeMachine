@@ -2,12 +2,20 @@
 import sys
 import csv
 import operator
+import gensim
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem.porter import PorterStemmer
+from stop_words import get_stop_words
 
+tokenizer = RegexpTokenizer(r'\w+')
+en_stop = get_stop_words('en')
 q = 'Michael I. Jordan'
 
+author_texts = []
 author_variety = []
 relevant_authors = []
 relevant_papers = []
+texts = []
 
 coauthors = {}
 years = {}
@@ -59,6 +67,7 @@ for author in authors:
 for paper in papers:
   for relevant_paper in relevant_papers:
     if paper.get('id') == relevant_paper:
+      author_texts.append(paper.get('title'))
       year = paper.get('year')
       if year in years:
         years[year] += 1
@@ -73,3 +82,21 @@ for year in range(int(sorted_years[-1]), int(sorted_years[0])):
   year_str = str(year)
   if year_str in years:
     print(year_str + ': ' + str(years[year_str]))
+
+# LDA topic extraction
+print('LDA incoming:')
+
+# Remove stop words and stem
+for text in author_texts:
+  raw = text.lower()
+  tokens = tokenizer.tokenize(raw)
+  stopped_tokens = [i for i in tokens if not i in en_stop]
+  p_stemmer = PorterStemmer()
+  stemmed_tokens = [p_stemmer.stem(i) for i in stopped_tokens]
+  texts.append(stemmed_tokens)
+
+dictionary = gensim.corpora.Dictionary(texts)
+corpus = [dictionary.doc2bow(text) for text in texts]
+ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=3, id2word = dictionary, passes=20)
+
+print(ldamodel.print_topics(num_topics=3, num_words=3))
