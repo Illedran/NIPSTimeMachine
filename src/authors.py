@@ -82,11 +82,11 @@ for paper in papers:
       else:
         years[year] = 1
 
-sorted_years = sorted(years, key=operator.itemgetter(1))
+sorted_years = sorted(years)
 
 print('Count of papers by year:')
 
-for year in range(int(sorted_years[-1]), int(sorted_years[0])):
+for year in range(int(sorted_years[0]), int(sorted_years[-1])):
   year_str = str(year)
   if year_str in years:
     print(year_str + ': ' + str(years[year_str]))
@@ -97,19 +97,19 @@ for text in author_texts:
   raw = text.lower()
   tokens = tokenizer.tokenize(raw)
   stopped_tokens = [i for i in tokens if not i in en_stop]
-  p_stemmer = PorterStemmer()
-  stemmed_tokens = [p_stemmer.stem(i) for i in stopped_tokens]
-  terms = filter(lambda x: len(x) > 2 and not is_number(x), stemmed_tokens)
+  # p_stemmer = PorterStemmer()
+  # stemmed_tokens = [p_stemmer.stem(i) for i in stopped_tokens]
+  terms = filter(lambda x: len(x) > 2 and not is_number(x), stopped_tokens)
   texts.append(list(terms))
 
 # Build models
 dictionary = gensim.corpora.Dictionary(texts)
 corpus = [dictionary.doc2bow(text) for text in texts]
-ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=8, id2word=dictionary, passes=20)
+ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=5, id2word=dictionary, passes=20)
 lsimodel = gensim.models.lsimodel.LsiModel(corpus, id2word=dictionary, num_topics=5)
 
 # Print results of topic modeling
 print('LDA:')
-print(ldamodel.print_topics(num_topics=8, num_words=8))
+print(ldamodel.show_topics(10, 7))
 print('LSI:')
 print(lsimodel.print_topics(5))
