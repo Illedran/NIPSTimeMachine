@@ -65,5 +65,5 @@ def search(query_str, search_field="title", index_name="index"):
 def init():
 	schema = create_schema()
 	create_index(schema)
-	load_csv_to_index('papers.csv')
+	load_csv_to_index('./nips-data/papers.csv')
 	return
