@@ -12,13 +12,12 @@ en_stop = get_stop_words('en')
 q = 'Michael I. Jordan'
 
 author_texts = []
-author_variety = set()
-relevant_authors = []
 relevant_papers = []
 texts = []
 
 coauthors = {}
 years = {}
+
 
 # Check for numbers in text
 def is_number(n):
@@ -28,20 +27,42 @@ def is_number(n):
   except:
     return False
 
-# Get all authors that match the name passed
-with open('../nips-data/authors.csv', 'r') as csv_file:
-  authors = csv.DictReader(csv_file)
-  for author in authors:
-    if author.get('name').find(q) != -1:
-      relevant_authors.append(author.get('id'))
-      author_variety.add(author.get('name'))
 
-# We have to narrow it down to just one author
-if len(author_variety) == 0:
-  sys.exit('Could not find any author named "{}"'.format(q))
-if len(author_variety) > 1:
-  potential_authors = ', '.join(author_variety)
-  sys.exit('Different authors found. Did you mean one of these: ' + potential_authors)
+def process_authors(name):
+  """
+  Returns
+  -------
+  (relevant_authors, author_variety) - tuple where:
+    - relevant_authors: TODO
+    - author_variety: TODO
+  """
+  relevant_authors = []
+  author_variety = set()
+  # Get all authors that match the name passed
+  with open('../nips-data/authors.csv', 'r') as csv_file:
+    authors = csv.DictReader(csv_file)
+    for author in authors:
+      if author.get('name').find(name) != -1:
+        relevant_authors.append(author.get('id'))
+        author_variety.add(author.get('name'))
+
+  return (relevant_authors, author_variety)
+
+
+def check_author_validity(author_variety,  author_name):
+  """
+  Make sure that only one author is matched.
+  """
+  if len(author_variety) == 0:
+    sys.exit('Could not find any author named "{}"'.format(author_name))
+  if len(author_variety) > 1:
+    potential_authors = ', '.join(author_variety)
+    sys.exit('Different authors found. Did you mean one of these: ' + potential_authors)
+
+
+relevant_authors, author_variety = process_authors(q)
+
+check_author_validity(author_variety, q)
 
 for relevant_author in relevant_authors:
   with open('../nips-data/paper_authors.csv', 'r') as csv_file:
