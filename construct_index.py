@@ -25,7 +25,7 @@ def create_index(schema, index_name="index"):
 def load_csv_to_index(csv_file_name, index_name="index"):
 	ix = open_dir(index_name)
 	writer = ix.writer()
-	num = 100
+	# num = 100
 	with open(csv_file_name) as csvfile:
 		reader = csv.DictReader(csvfile)
 		# for i in range(num):
