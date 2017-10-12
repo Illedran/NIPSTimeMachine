@@ -6,6 +6,9 @@ import gensim
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem.porter import PorterStemmer
 from stop_words import get_stop_words
+from tqdm import tqdm
+import re
+import pandas as pd
 
 tokenizer = RegexpTokenizer(r'\w+')
 en_stop = get_stop_words('en')
@@ -20,9 +23,17 @@ texts = []
 coauthors = {}
 years = {}
 
-papers = csv.DictReader(open('../nips-data/papers.csv'))
+papers = csv.DictReader(open('../nips-data/papers2.csv'))
 authors = csv.DictReader(open('../nips-data/authors.csv'))
 paper_authors = csv.DictReader(open('../nips-data/paper_authors.csv'))
+
+# Check for numbers in text
+def is_number(n):
+  try:
+    float(n)
+    return True
+  except:
+    return False
 
 # Get all authors that have a similar name
 for author in authors:
@@ -67,7 +78,7 @@ for author in authors:
 for paper in papers:
   for relevant_paper in relevant_papers:
     if paper.get('id') == relevant_paper:
-      author_texts.append(paper.get('title'))
+      author_texts.append(paper.get('abstract'))
       year = paper.get('year')
       if year in years:
         years[year] += 1
@@ -84,19 +95,24 @@ for year in range(int(sorted_years[-1]), int(sorted_years[0])):
     print(year_str + ': ' + str(years[year_str]))
 
 # LDA topic extraction
-print('LDA incoming:')
-
 # Remove stop words and stem
-for text in author_texts:
+for text in tqdm(author_texts):
   raw = text.lower()
   tokens = tokenizer.tokenize(raw)
   stopped_tokens = [i for i in tokens if not i in en_stop]
   p_stemmer = PorterStemmer()
   stemmed_tokens = [p_stemmer.stem(i) for i in stopped_tokens]
-  texts.append(stemmed_tokens)
+  terms = filter(lambda x: len(x) > 2 and not is_number(x), stemmed_tokens)
+  texts.append(list(terms))
 
+# Build models
 dictionary = gensim.corpora.Dictionary(texts)
 corpus = [dictionary.doc2bow(text) for text in texts]
-ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=3, id2word = dictionary, passes=20)
+ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=8, id2word=dictionary, passes=20)
+lsimodel = gensim.models.lsimodel.LsiModel(corpus, id2word=dictionary, num_topics=5)
 
-print(ldamodel.print_topics(num_topics=3, num_words=3))
+# Print results of topic modeling
+print('LDA:')
+print(ldamodel.print_topics(num_topics=8, num_words=8))
+print('LSI:')
+print(lsimodel.print_topics(5))
