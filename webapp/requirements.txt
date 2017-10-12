@@ -1,0 +1,4 @@
+flask
+sklearn
+nltk
+numpy
