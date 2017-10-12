@@ -14,7 +14,6 @@ q = 'Michael I. Jordan'
 author_texts = []
 texts = []
 
-coauthors = {}
 years = {}
 
 
@@ -71,15 +70,10 @@ def get_relevant_papers(relevant_authors):
 
   return relevant_papers
 
-if __name__ == '__main__':
-
-  relevant_authors, author_variety = process_authors(q)
-
-  check_author_validity(author_variety, q)
-
-  relevant_papers = get_relevant_papers(relevant_authors)
-
+def get_coauthors(relevant_papers, relevant_authors):
   # Get co-authors
+  coauthors = {}
+
   with open('../nips-data/paper_authors.csv', 'r') as csv_file:
     paper_authors = csv.DictReader(csv_file)
     for paper_author in paper_authors:
@@ -91,6 +85,18 @@ if __name__ == '__main__':
               coauthors[author] +=1
             else:
               coauthors[author] = 1
+
+  return coauthors
+
+if __name__ == '__main__':
+
+  relevant_authors, author_variety = process_authors(q)
+
+  check_author_validity(author_variety, q)
+
+  relevant_papers = get_relevant_papers(relevant_authors)
+
+  coauthors = get_coauthors(relevant_papers, relevant_authors)
 
   sorted_coauthors = sorted(coauthors, key=operator.itemgetter(1), reverse=True)
 
