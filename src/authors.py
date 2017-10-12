@@ -6,9 +6,6 @@ import gensim
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem.porter import PorterStemmer
 from stop_words import get_stop_words
-from tqdm import tqdm
-import re
-import pandas as pd
 
 tokenizer = RegexpTokenizer(r'\w+')
 en_stop = get_stop_words('en')
@@ -96,7 +93,7 @@ for year in range(int(sorted_years[-1]), int(sorted_years[0])):
 
 # LDA topic extraction
 # Remove stop words and stem
-for text in tqdm(author_texts):
+for text in author_texts:
   raw = text.lower()
   tokens = tokenizer.tokenize(raw)
   stopped_tokens = [i for i in tokens if not i in en_stop]
