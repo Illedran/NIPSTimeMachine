@@ -12,7 +12,7 @@ en_stop = get_stop_words('en')
 q = 'Michael I. Jordan'
 
 author_texts = []
-author_variety = []
+author_variety = set()
 relevant_authors = []
 relevant_papers = []
 texts = []
@@ -28,22 +28,19 @@ def is_number(n):
   except:
     return False
 
-# Get all authors that have a similar name
-
+# Get all authors that match the name passed
 with open('../nips-data/authors.csv', 'r') as csv_file:
   authors = csv.DictReader(csv_file)
   for author in authors:
     if author.get('name').find(q) != -1:
       relevant_authors.append(author.get('id'))
-      author_variety.append(author.get('name'))
+      author_variety.add(author.get('name'))
 
 # We have to narrow it down to just one author
-unique_authors = list(set(author_variety))
-
-if len(unique_authors) == 0:
+if len(author_variety) == 0:
   sys.exit('Could not find any author named "{}"'.format(q))
-if len(unique_authors) > 1:
-  potential_authors = ', '.join(unique_authors)
+if len(author_variety) > 1:
+  potential_authors = ', '.join(author_variety)
   sys.exit('Different authors found. Did you mean one of these: ' + potential_authors)
 
 for relevant_author in relevant_authors:
