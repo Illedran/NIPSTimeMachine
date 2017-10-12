@@ -12,7 +12,6 @@ en_stop = get_stop_words('en')
 q = 'Michael I. Jordan'
 
 author_texts = []
-relevant_papers = []
 texts = []
 
 coauthors = {}
@@ -60,11 +59,8 @@ def check_author_validity(author_variety,  author_name):
     sys.exit('Different authors found. Did you mean one of these: ' + potential_authors)
 
 
-if __name__ == '__main__':
-
-  relevant_authors, author_variety = process_authors(q)
-
-  check_author_validity(author_variety, q)
+def get_relevant_papers(relevant_authors):
+  relevant_papers = []
 
   for relevant_author in relevant_authors:
     with open('../nips-data/paper_authors.csv', 'r') as csv_file:
@@ -73,6 +69,15 @@ if __name__ == '__main__':
         if paper_author.get('author_id') == str(relevant_author):
           relevant_papers.append(paper_author.get('paper_id'))
 
+  return relevant_papers
+
+if __name__ == '__main__':
+
+  relevant_authors, author_variety = process_authors(q)
+
+  check_author_validity(author_variety, q)
+
+  relevant_papers = get_relevant_papers(relevant_authors)
 
   # Get co-authors
   with open('../nips-data/paper_authors.csv', 'r') as csv_file:
