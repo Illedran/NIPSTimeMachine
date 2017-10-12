@@ -3,6 +3,7 @@ import sys
 import csv
 import operator
 import gensim
+from collections import defaultdict
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem.porter import PorterStemmer
 from stop_words import get_stop_words
@@ -72,7 +73,7 @@ def get_relevant_papers(relevant_authors):
 
 def get_coauthors(relevant_papers, relevant_authors):
   # Get co-authors
-  coauthors = {}
+  coauthors = defaultdict(lambda: 0)
 
   with open('../nips-data/paper_authors.csv', 'r') as csv_file:
     paper_authors = csv.DictReader(csv_file)
@@ -81,10 +82,7 @@ def get_coauthors(relevant_papers, relevant_authors):
         if str(relevant_paper) == paper_author.get('paper_id'):
           if paper_author.get('author_id') not in relevant_authors:
             author = paper_author.get('author_id')
-            if author in coauthors:
-              coauthors[author] +=1
-            else:
-              coauthors[author] = 1
+            coauthors[author] += 1
 
   return coauthors
 
