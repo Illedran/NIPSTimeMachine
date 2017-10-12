@@ -20,7 +20,7 @@ texts = []
 coauthors = {}
 years = {}
 
-papers = csv.DictReader(open('../nips-data/papers2.csv'))
+papers = csv.DictReader(open('../nips-data/papers.csv'))
 authors = csv.DictReader(open('../nips-data/authors.csv'))
 paper_authors = csv.DictReader(open('../nips-data/paper_authors.csv'))
 
