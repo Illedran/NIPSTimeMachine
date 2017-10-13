@@ -7,7 +7,7 @@
 <body>
     <div class="container">
         <img src="{{ url_for('static', filename='logo_classic.png') }}" class="logo_image" />
-        <h4 align="center">Everything you want to now and most likely even more</h4>
+        <h4 align="center">Everything you want to know and most likely even more</h4>
         <form action="/search" method="GET">
             <input type="text" name="q" size="60" class="query_input" value="{{ query }}" />
             <input type="submit" name="" value="I'm feeling lucky" />
@@ -18,8 +18,8 @@
             <div class="search_result">
                 <h5><span class="year">{{ res.year }}</span> {{ res.title }}</h5>
             </div>
-            {%endfor%}  
+            {%endfor%}
         </div>
-    </div>  
+    </div>
 </body>
 </html>

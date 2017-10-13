@@ -4,20 +4,39 @@ body {
 }
 
 .container {
+    display: flex;
     width: 50%;
     margin: auto;
     margin-top: 100px;
-    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-}
-
-.search_container {
 }
 
 .logo_image {
     max-width: 100%;
     height: auto;
     margin: auto;
+}
+
+.error {
+    color: #f00;
+}
+
+.search_container {
+    width: 100%;
+    padding-top: 18px;
+    text-align: left;
+}
+
+.search_container h5 {
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+
+.search_container h5,
+.search_container span,
+.search_container strong {
+    font-size: 12px;
+    line-height: 16px;
 }
