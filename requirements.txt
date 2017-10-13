@@ -21,6 +21,7 @@ mistune==0.7.4            # via nbconvert
 nbconvert==5.3.1          # via notebook
 nbformat==4.4.0           # via nbconvert, notebook
 notebook==5.1.0
+nltk==3.2.5
 numpy==1.13.3
 pandas==0.20.3
 pandocfilters==1.4.2      # via nbconvert
@@ -39,6 +40,7 @@ scipy==0.19.1
 simplegeneric==0.8.1      # via ipython
 six==1.11.0               # via bleach, gensim, html5lib, prompt-toolkit, python-dateutil, traitlets
 smart-open==1.5.3         # via gensim
+stop-words==2015.2.23.1
 terminado==0.6            # via notebook
 testpath==0.3.1           # via nbconvert
 tornado==4.5.2            # via ipykernel, notebook, terminado
