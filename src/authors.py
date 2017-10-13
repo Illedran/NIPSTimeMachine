@@ -127,12 +127,13 @@ def build_models(texts):
   print('LSI:')
   print(lsimodel.print_topics(5))
 
+  return ldamodel, lsimodel
 
-if __name__ == '__main__':
 
-  relevant_authors, author_variety = process_authors(q)
+def author_query(author_name):
+  relevant_authors, author_variety = process_authors(author_name)
 
-  check_author_validity(author_variety, q)
+  check_author_validity(author_variety, author_name)
 
   relevant_papers = get_relevant_papers(relevant_authors)
 
@@ -161,4 +162,10 @@ if __name__ == '__main__':
 
   texts = get_text_keywords_sanitized(author_texts)
 
-  build_models(texts)
+  lsa_model, lsi_model = build_models(texts)
+
+  return lsa_model, lsi_model
+
+if __name__ == '__main__':
+  lsa_model, lsmi_model = author_query(q)
+  # lsa_model.
