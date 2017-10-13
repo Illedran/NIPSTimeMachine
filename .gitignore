@@ -109,3 +109,4 @@ requirements.in
 .vscode/
 index/
 .py.bak
+.ipynb_checkpoints/
