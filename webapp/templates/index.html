@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NIPSTimeMachine</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='logo_classic.png') }}" class="logo_image" />
+        <h4 align="center">Everything you want to now and most likely even more</h4>
+        <form action="/search" method="GET">
+            <input type="text" name="q" size="60" class="query_input" />
+            <input type="submit" name="" value="I'm feeling lucky" />
+        </form>
+    </div>  
+</body>
+</html>
