@@ -31,7 +31,6 @@ def teardown_db(exception):
     if db is not None:
         db.close()
 
-
 def retreive_results(query, n=10):
     engine = get_engine()
     ids = engine.get_best_matches(query, n)
@@ -46,15 +45,15 @@ def retrieve_author_ids(query):
     db = get_db()
     return authors.retrieve(query, db)
 
-def retrieve_author_papers(author_ids):
+# Retrieve info about the author, takes author_ids since one author can have 1+ entries
+def retrieve_author_info(author_ids):
     authors = get_authors()
     db = get_db()
-    return authors.get_relevant_papers(author_ids, db)
-
-def retrieve_coauthors(author_ids):
-    authors = get_authors()
-    db = get_db()
-    return authors.get_coauthors(author_ids, db)
+    results = {}
+    results['papers'] = authors.get_relevant_papers(author_ids, db)
+    results['coauthors'] = authors.get_coauthors(author_ids, db)
+    results['years'] = authors.get_years(author_ids, db)
+    return results
 
 @app.route('/')
 def index():
@@ -81,14 +80,14 @@ def authors():
             query=query,
             search_results=[])
     else:
-        search_results = retrieve_author_papers(author_ids)
-        search_results = [{'title' : res[0], 'year' : res[1]} for res in search_results]
-        coauthors = retrieve_coauthors(author_ids)
-        # coauthors = coauthors.pop(query)
-        coauthors = [{'name' : coauthor, 'count' : coauthors[coauthor]} for coauthor in coauthors]
+        search_results = retrieve_author_info(author_ids)
+        papers = [{'title' : paper[0], 'year' : paper[1]} for paper in search_results['papers']]
+        coauthors = [{'name' : coauthor, 'count' : search_results['coauthors'][coauthor]} for coauthor in search_results['coauthors']][:10]
+        papers_by_year = [{'year': year, 'count': search_results['years'][year]} for year in search_results['years']]
         return render_template('authors.html',
+        papers_by_year=papers_by_year,
         query=query,
-        search_results=search_results,
+        papers=papers,
         coauthors=coauthors)
 
 if __name__ == '__main__':

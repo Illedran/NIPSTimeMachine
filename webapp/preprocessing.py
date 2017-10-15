@@ -1,6 +1,4 @@
 import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
 
 class BasicTokenizer:
     '''
@@ -58,6 +56,7 @@ class Preprocessor:
         self.stemmer = SnowballStemmer()
 
     def process(self, text):
+        text = text.lower()
         tokens = self.tokenizer.tokenize(text)
         tokens = self.filter.filt(tokens)
         tokens = self.stemmer.stem(tokens)

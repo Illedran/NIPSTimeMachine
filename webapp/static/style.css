@@ -40,3 +40,8 @@ body {
     font-size: 12px;
     line-height: 16px;
 }
+
+table td {
+    padding: 4px;
+    border: 1px solid #000;
+}
