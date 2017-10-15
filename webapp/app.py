@@ -53,6 +53,8 @@ def retrieve_author_info(author_ids):
     results['papers'] = authors.get_relevant_papers(author_ids, db)
     results['coauthors'] = authors.get_coauthors(author_ids, db)
     results['years'] = authors.get_years(author_ids, db)
+    results['keywords'] = authors.get_keywords(author_ids, db)
+    results['topics'] = authors.get_topics(author_ids, db)
     return results
 
 @app.route('/')
@@ -84,11 +86,13 @@ def authors():
         papers = [{'title' : paper[0], 'year' : paper[1]} for paper in search_results['papers']]
         coauthors = [{'name' : coauthor, 'count' : search_results['coauthors'][coauthor]} for coauthor in search_results['coauthors']][:10]
         papers_by_year = [{'year': year, 'count': search_results['years'][year]} for year in search_results['years']]
+        keywords = search_results['keywords'][:10]
         return render_template('authors.html',
         papers_by_year=papers_by_year,
         query=query,
         papers=papers,
-        coauthors=coauthors)
+        coauthors=coauthors,
+        keywords=keywords)
 
 if __name__ == '__main__':
     app.run()

@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
 }
-
+/*
 .container {
     display: flex;
     width: 50%;
@@ -11,6 +11,18 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+}*/
+
+.row {
+    width: 100%;
+}
+
+.stats, .chart {
+    padding-top: 30px;
+}
+
+.author {
+    padding-top: 15px;
 }
 
 .logo_image {

@@ -2,6 +2,7 @@
 import operator
 from collections import defaultdict, OrderedDict
 from preprocessing import Preprocessor
+import gensim
 
 # Check for numbers in text
 def is_number(n):
@@ -49,6 +50,14 @@ class Authors:
 
         return [results[i] for i in paper_ids]
 
+    def get_author_texts(self, author_ids, db):
+        papers_text = ''
+        papers = self.get_relevant_papers(author_ids, db)
+        for paper in papers:
+            papers_text += paper[1]
+
+        return papers_text
+
     def get_coauthor_ids(self, author_ids, db):
         coauthors = defaultdict(lambda: 0)
         paper_ids = self.get_author_paper_ids(author_ids, db)
@@ -81,7 +90,7 @@ class Authors:
 
         return OrderedDict(sorted(years.items(), key=operator.itemgetter(0)))
 
-    def get_text_keywords_sanitized(self, author_texts):
+    def get_text_tokens(self, author_texts):
         texts = []
         results = []
         preprocessor = Preprocessor()
@@ -91,3 +100,8 @@ class Authors:
             results.append(list(terms))
 
         return results
+
+    def get_keywords(self, author_ids, db):
+        papers_text = self.get_author_texts(author_ids, db)
+
+        return gensim.summarization.keywords(papers_text, ratio=0.05).split('\n')

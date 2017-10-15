@@ -2,50 +2,79 @@
 <html>
 <head>
     <title>NIPSTimeMachine</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='years.js') }}"></script>
 </head>
 <body>
     <div class="container">
-        <img src="{{ url_for('static', filename='logo_classic.png') }}" class="logo_image" />
-        {% if error %}
-            <h4 class="error" align="center">{{ error }}</h4>
-        {% else %}
-            <h4 align="center">Everything you want to know and most likely even more</h4>
-        {% endif %}
-        <form action="/authors" method="GET">
-            <input type="text" name="q" size="60" class="query_input" value="{{ query }}" />
-            <input type="submit" name="" value="I'm feeling lucky" />
-        </form>
+        <div class="row">
+            <div class="col-12 text-center">
+                <img src="{{ url_for('static', filename='logo_classic.png') }}" class="logo_image" />
+                {% if error %}
+                    <h4 class="error" align="center">{{ error }}</h4>
+                {% else %}
+                    <h4 align="center">Everything you want to know and most likely even more</h4>
+                {% endif %}
+                <form action="/authors" method="GET">
+                    <input type="text" name="q" size="60" class="query_input" value="{{ query }}" class="form-control" />
+                    <input type="submit" name="" value="I'm feeling lucky" class="btn btn-primary" />
+                </form>
+            </div>
+        </div>
 
         {% if not error %}
-            <div class="search_container">
-                <h4>Paper count by year for {{ query }}:</h4>
-                <table>
-                    {% for year_with_count in papers_by_year %}
-                        <tr>
-                            <td><strong class="name">{{ year_with_count.year }}</strong></td>
-                            <td><span>{{ year_with_count.count }}</span></td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-
-            <div class="search_container">
-                <h4>Common co-authors for {{ query }}:</h4>
-                {% for coauthor in coauthors %}
-                    <strong class="name">{{ coauthor.name }}:</strong> <span>{{ coauthor.count }},</span>
-                {% endfor %}
-            </div>
-
-            <div class="search_container">
-                <h4>{{ query }} papers:</h4>
-                {% for paper in papers %}
-                    <div class="search_result">
-                        <h5><span class="year">{{ paper.year }}</span> {{ paper.title }}</h5>
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="author">
+                        <h1>{{query}}</h1>
+                        <span>Citation index: XX</span>
                     </div>
-                {% endfor %}
+                </div>
+            </div>
+            <div class="row stats">
+                <div class="col-md-4">
+                    <h4>Similar authors</h4>
+                    <ul>
+                        <!-- similar authors loop here -->
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Common co-authors</h4>
+                    <ul>
+                        {% for coauthor in coauthors %}
+                            <li>
+                                <span>{{ coauthor.name }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Keywords</h4>
+                    <ul>
+                        {% for keyword in keywords %}
+                            <li>{{keyword}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="row chart">
+                <div class="col-12">
+                    <h4>Paper count by year</h4>
+                    <div class="js-years-chart">
+                    </div>
+                </div>
             </div>
         {% endif %}
     </div>
+    <script type=text/javascript>
+        drawChart({{ papers_by_year|tojson|safe }});
+    </script>
 </body>
 </html>
