@@ -105,3 +105,18 @@ class Authors:
         papers_text = self.get_author_texts(author_ids, db)
 
         return gensim.summarization.keywords(papers_text, ratio=0.05).split('\n')
+
+    def get_topics(self, author_ids, db):
+        # Download the missing files for the model here: https://failiem.lv/u/2gfgcp35
+        top_topics = []
+        papers_text = self.get_author_texts(author_ids, db)
+        dictionary = gensim.corpora.Dictionary.load('./models/topics.dict')
+        corpus = gensim.corpora.MmCorpus('./models/corpus.mm')
+        query = dictionary.doc2bow(papers_text.lower().split())
+        lda = gensim.models.ldamodel.LdaModel.load('./models/topics.lda')
+        topics = lda[query]
+        a = list(sorted(topics, key=lambda x: x[1]))
+        for i in range(3):
+            top_topics.append(lda.print_topic(a[i][0]))
+
+        return top_topics
