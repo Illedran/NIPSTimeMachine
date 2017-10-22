@@ -24,7 +24,7 @@ mistune==0.7.4            # via nbconvert
 nbconvert==5.3.1          # via notebook
 nbformat==4.4.0           # via nbconvert, notebook
 nltk==3.2.5
-notebook==5.1.0
+notebook==5.2.0
 numpy==1.13.3
 pandas==0.20.3
 pandocfilters==1.4.2      # via nbconvert
@@ -46,6 +46,7 @@ scikit-learn==0.19.0
 scipy==0.19.1
 simplegeneric==0.8.1      # via ipython
 six==1.11.0               # via bleach, gensim, html5lib, nltk, prompt-toolkit, python-dateutil, traitlets
+sklearn==0.0
 smart-open==1.5.3         # via gensim
 terminado==0.6            # via notebook
 testpath==0.3.1           # via nbconvert

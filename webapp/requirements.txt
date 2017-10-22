@@ -1,4 +1,0 @@
-flask
-sklearn
-nltk
-numpy
