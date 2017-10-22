@@ -1,12 +1,10 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import pickle
 from preprocessing import Preprocessor
 
-
 class BasicVSRanker:
-
     @staticmethod
     def from_tokenized(texts, prepr=Preprocessor()):
         vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
@@ -20,12 +18,15 @@ class BasicVSRanker:
         ranker.query_prepr = prepr
         ranker.similarity_function = cosine_similarity
 
-        return ranker
-
-    @staticmethod
-    def from_raw(texts, prepr=Preprocessor()):
-        tokenized = prepr.process_texts(texts)
-        return BasicVSRanker.from_tokenized(tokenized, prepr)
+    # def __init__(self, texts):
+    #     vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
+    #     with Pool() as executor:
+    #         vectorized_texts = vectorizer.fit_transform(
+    #             [" ".join(ptext) for ptext in executor.map(Preprocesser.process, texts)])
+    #
+    #     self.vectorizer = vectorizer
+    #     self.vectorized_texts = vectorized_texts
+    #     self.similarity_function = cosine_similarity
 
     def process_query(self, query):
         query = self.query_prepr.process(query)

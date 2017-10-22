@@ -8,23 +8,12 @@
         more</h4>
 </div>
 
-<div class="row">
-    <form action="/search" class="search_form" method="GET">
-        <div class="form-group">
-            <input type="text" name="q" class="form-control"
-                   placeholder="Enter query..."/>
-        </div>
-        <div class="form-group text-right">
-            <input type="submit" class="btn btn-success" name=""
-                   value="I'm feeling lucky"/>
-        </div>
-    </form>
-</div>
+{% include "search_form.html" %}
 
 <div class="search_container marketing">
     <div class="row">
         {% for res in search_results %}
-        <div class="col-sm-4">
+        <div class="col-4">
             <div class="card text-center">
                 <div class="card-block">
                     <h5 class="card-title">{{ res.title }}</h5>

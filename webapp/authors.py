@@ -1,7 +1,7 @@
 # Author: Krists Kreics
 import operator
 from collections import defaultdict, OrderedDict
-from preprocessing import Preprocessor
+from preprocessing import Preprocesser
 import gensim
 
 # Check for numbers in text
@@ -91,10 +91,8 @@ class Authors:
         return OrderedDict(sorted(years.items(), key=operator.itemgetter(0)))
 
     def get_text_tokens(self, author_texts):
-        texts = []
         results = []
-        preprocessor = Preprocessor()
-        texts = preprocessor.process_texts(author_texts)
+        texts = Preprocesser.process(author_texts)
         for tokens in texts:
             terms = filter(lambda x: len(x) > 2 and not is_number(x), tokens)
             results.append(list(terms))
