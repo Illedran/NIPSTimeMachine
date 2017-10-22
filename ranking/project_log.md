@@ -27,3 +27,13 @@ Basic vector space retreival ranking implementation with TF-IDF features.
 - Python module for text preprocessing: tokenization, stemming (with ability to choose different parameters and strategies).
 - Python module for (d, q) pair scoring.
 - Jupyter Notebook for module demonstration.
+
+### Weighted VSR zone ranking
+**Directory:** 3_vsr_zones
+
+**Input:** NIPS dataset
+
+**Deliverables**
+Implementation of VSR ranking with zone weights.
+- Python module for (d, q) pair scoring.
+- Jupyter Notebook for module demonstration.
