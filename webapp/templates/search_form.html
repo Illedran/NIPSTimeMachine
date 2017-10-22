@@ -1,0 +1,37 @@
+<div class="row">
+    <form id="search_form" action="/search" class="search_form" method="GET" enctype="multipart/form-data">
+        <div class="form-group row">
+            <div class="col-11">
+                <input type="text" name="q" class="form-control"
+                       placeholder="Enter query..."/>
+            </div>
+            <div class="col-1">
+                <input type="file" id="file" style="display: none;" accept="application/pdf,application/pdf,application/msword,
+  application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt">
+                <h2><i id="file_icon" class="fa fa-file-text" aria-hidden="true"
+                       onclick="document.getElementById('file').click();"></i>
+                </h2>
+            </div>
+        </div>
+        <!--<div class="form-group text-right">-->
+        <!--<input type="submit" class="btn btn-success" name=""-->
+        <!--value="I'm feeling lucky"/>-->
+        <!--</div>-->
+    </form>
+</div>
+
+{% block scripts %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+            var file_input = $("#file");
+            var form = $("#search_form");
+            var file_icon = $("#file_icon");
+            file_input.on('change', function () {
+                form.submit();
+            });
+            file_icon.on('click', function () {
+                file_input.click();
+            });
+        });
+    </script>
+{% endblock %}

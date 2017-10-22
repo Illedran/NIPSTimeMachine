@@ -17,6 +17,7 @@
 }
 
 .search_form {
+    margin-left: 20px;
     width: 100%;
 }
 
@@ -27,4 +28,9 @@
 
 .card:hover {
     border-color: darkcyan;
+}
+
+.fa-file-text:hover {
+    cursor: pointer;
+    color: darkcyan;
 }
