@@ -13,7 +13,7 @@ class BasicVSRanker:
     def generate_default_ranker(cls):
         data = pd.read_csv('../nips-data/papers.csv')
         with open("models/ranker.pkl3", 'wb') as f:
-            pickle.dump(cls(data.paper_text.sample(n=100)), f)
+            pickle.dump(cls(data.paper_text), f)
 
     @classmethod
     def generate_ranker(cls, texts):
@@ -23,8 +23,7 @@ class BasicVSRanker:
         vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
         with Pool() as executor:
             vectorized_texts = vectorizer.fit_transform(
-                [" ".join(ptext) for ptext in
-                 executor.map(Preprocesser.process, texts)])
+                [" ".join(ptext) for ptext in executor.map(Preprocesser.process, texts)])
 
         self.vectorizer = vectorizer
         self.vectorized_texts = vectorized_texts
