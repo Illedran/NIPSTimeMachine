@@ -110,12 +110,3 @@ requirements.in
 index/
 .py.bak
 .ipynb_checkpoints/
-
-# Models
-*.dict
-*.lda
-*.npy
-*.id2word
-*.state
-*.mm
-*.index
