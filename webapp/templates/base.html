@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block head %}
+    <title>{% block title %}{% endblock %} - NIPSTimeMachine</title>
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    {% endblock %}
+</head>
+<body>
+<div class="container">
+    <div id="header">
+        <header class="header clearfix">
+            {% block header %}
+            <nav>
+                <ul class="nav nav-pills float-right">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home <span
+                                class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="https://github.com/Illedran/NIPSTimeMachine">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="mailto:a.andrea@student.tue.nl,g.alonso.nunez@student.tue.nl,x.kong1@student.tue.nl,k.kreics@student.tue.nl,e.lomagin@student.tue.nl,t.wang.2@student.tue.nl">Contact</a>
+                    </li>
+                </ul>
+            </nav>
+            <!--<h3 class="text-muted">NIPS Time Machine</h3>-->
+            {% endblock %}
+        </header>
+    </div>
+
+    <div id="content">
+        <main role="main">
+            {% block main %}{% endblock %}
+        </main>
+    </div>
+
+    <div id="footer">
+        <footer class="footer">
+            {% block footer %}
+            <p align="right" class="text-muted">&copy; Guillermo Alonso, Xinyi
+                Kong,
+                Krists Kreics, Egor Lomagin, Andrea Nardelli, Tianze Wang</p>
+            {% endblock %}
+        </footer>
+    </div>
+</div>
+</body>
+</html>

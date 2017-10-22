@@ -1,22 +1,3 @@
-body {
-    margin: 0;
-    padding: 0;
-}
-/*
-.container {
-    display: flex;
-    width: 50%;
-    margin: auto;
-    margin-top: 100px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-}*/
-
-.row {
-    width: 100%;
-}
-
 .stats, .chart {
     padding-top: 30px;
 }
@@ -35,25 +16,15 @@ body {
     color: #f00;
 }
 
-.search_container {
+.search_form {
     width: 100%;
-    padding-top: 18px;
-    text-align: left;
 }
 
-.search_container h5 {
-    margin-top: .5em;
-    margin-bottom: .5em;
+.card {
+    padding: 5px;
+    margin: 5px;
 }
 
-.search_container h5,
-.search_container span,
-.search_container strong {
-    font-size: 12px;
-    line-height: 16px;
-}
-
-table td {
-    padding: 4px;
-    border: 1px solid #000;
+.card:hover {
+    border-color: darkcyan;
 }
