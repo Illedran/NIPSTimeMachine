@@ -47,14 +47,18 @@ def get_text_keywords_sanitized(all_texts):
 
 
 def build_models(texts):
+  topics = 10
+  passes = 5
   # Build models
   dictionary = gensim.corpora.Dictionary(texts)
   corpus = [dictionary.doc2bow(text) for text in texts]
-  ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=10, id2word=dictionary, passes=5)
+  ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=topics, id2word=dictionary, passes=passes)
 
   # Print results of topic modeling
   print('LDA:')
   print(ldamodel.show_topics(10, 7))
+
+  ldamodel.save('model_{}_{}.lda'.format(topics, passes))
 
 
 if __name__ == '__main__':
