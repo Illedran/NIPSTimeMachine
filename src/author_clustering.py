@@ -10,6 +10,9 @@ import numpy as np
 
 from sklearn.cluster import KMeans
 
+from papers import get_text_keywords_sanitized
+from papers import build_models
+
 # Key: author id. Value: Author name
 author_names = {}
 
@@ -101,3 +104,7 @@ def get_author_texts(paper_authors):
     return texts
 
 author_texts = get_author_texts(paper_authors)
+
+for author, author_texts in author_texts:
+    sanitized = get_text_keywords_sanitized(author_texts)
+    build_models(sanitized, savefile_prefix=int(author))
