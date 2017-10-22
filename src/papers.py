@@ -54,11 +54,13 @@ def build_models(texts):
   corpus = [dictionary.doc2bow(text) for text in texts]
   ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=topics, id2word=dictionary, passes=passes)
 
+  dictionary.save('topics.dict')
+  gensim.corpora.MmCorpus.serialize('topics.mm', corpus)
+  ldamodel.save('topics.lda')
+
   # Print results of topic modeling
   print('LDA:')
   print(ldamodel.show_topics(10, 7))
-
-  ldamodel.save('model_{}_{}.lda'.format(topics, passes))
 
 
 if __name__ == '__main__':
