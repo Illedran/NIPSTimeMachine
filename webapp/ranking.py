@@ -2,41 +2,62 @@
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from preprocessing import Preprocesser
-from pathos.multiprocessing import Pool
-import pandas as pd
-import pickle
-
+from preprocessing import Preprocessor
 
 class BasicVSRanker:
-    @classmethod
-    def generate_default_ranker(cls):
-        data = pd.read_csv('../nips-data/papers.csv')
-        with open("models/ranker.pkl3", 'wb') as f:
-            pickle.dump(cls(data.paper_text), f)
-
-    @classmethod
-    def generate_ranker(cls, texts):
-        return cls(texts)
-
-    def __init__(self, texts):
+    @staticmethod
+    def from_tokenized(texts, prepr=Preprocessor()):
         vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
-        with Pool() as executor:
-            vectorized_texts = vectorizer.fit_transform(
-                [" ".join(ptext) for ptext in executor.map(Preprocesser.process, texts)])
+        vectorized_texts = vectorizer.fit_transform(
+            [" ".join(text) for text in texts])
 
-        self.vectorizer = vectorizer
-        self.vectorized_texts = vectorized_texts
-        self.similarity_function = cosine_similarity
+        ranker = BasicVSRanker()
+        ranker.vectorizer = vectorizer
+        ranker.vectorized_texts = vectorized_texts
+        ranker.prepr = prepr
+        ranker.query_prepr = prepr
+        ranker.similarity_function = cosine_similarity
 
-    def get_best_matches(self, query, n=10):
-        query = Preprocesser.process(query)
+    # def __init__(self, texts):
+    #     vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
+    #     with Pool() as executor:
+    #         vectorized_texts = vectorizer.fit_transform(
+    #             [" ".join(ptext) for ptext in executor.map(Preprocesser.process, texts)])
+    #
+    #     self.vectorizer = vectorizer
+    #     self.vectorized_texts = vectorized_texts
+    #     self.similarity_function = cosine_similarity
+
+    def process_query(self, query):
+        query = self.query_prepr.process(query)
         query = self.vectorizer.transform([" ".join(query)])
-        return np.argsort(
-            -self.similarity_function(query, self.vectorized_texts)
-        ).flatten()[:n]
+        return query
 
     def get_scores(self, query):
-        query = Preprocesser.process(query)
-        query = self.vectorizer.transform([" ".join(query)])
+        query = self.process_query(query)
         return self.similarity_function(query, self.vectorized_texts)
+
+    def get_best_matches(self, query, n=10):
+        scores = self.get_scores(query)
+        return np.argsort(-scores).flatten()[:n]
+
+
+class EnsembleRanker:
+
+    def __init__(self):
+        self.rankers = []
+        self.weights = []
+
+    def add_ranker(self, ranker, weight):
+        self.rankers.append(ranker)
+        self.weights.append(weight)
+
+    def get_scores(self, query):
+        scores = []
+        for r, w in zip(self.rankers, self.weights):
+            scores.append(r.get_scores(query) * w)
+        return sum(scores)
+
+    def get_best_matches(self, query, n=10):
+        scores = self.get_scores(query)
+        return np.argsort(-scores).flatten()[:n]
