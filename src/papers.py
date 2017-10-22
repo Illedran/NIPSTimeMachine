@@ -46,7 +46,7 @@ def get_text_keywords_sanitized(all_texts):
   return texts
 
 
-def build_models(texts):
+def build_models(texts, savefile_prefix=''):
   topics = 10
   passes = 5
   # Build models
@@ -54,9 +54,9 @@ def build_models(texts):
   corpus = [dictionary.doc2bow(text) for text in texts]
   ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=topics, id2word=dictionary, passes=passes)
 
-  dictionary.save('topics.dict')
-  gensim.corpora.MmCorpus.serialize('topics.mm', corpus)
-  ldamodel.save('topics.lda')
+  dictionary.save('{}topics.dict'.format(savefile_prefix))
+  gensim.corpora.MmCorpus.serialize('{}topics.mm'.format(savefile_prefix), corpus)
+  ldamodel.save('{}topics.lda'.format(savefile_prefix))
 
   # Print results of topic modeling
   print('LDA:')
