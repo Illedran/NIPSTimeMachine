@@ -7,7 +7,7 @@ from ranking import BasicVSRanker, EnsembleRanker
 
 
 def main():
-    con = connect('../data/nips-papers/database.sqlite')
+    con = connect('database.sqlite')
 
     texts = [x[0]
              for x in con.execute('select paper_text from papers;').fetchall()]
