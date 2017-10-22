@@ -20,8 +20,6 @@ Article count, author count, unique word count, most frequent words, count of ar
 ### VSR baseline
 **Directory:** 2_vsr_baseline
 
-**Input:** NIPS dataset
-
 **Deliverables**
 Basic vector space retreival ranking implementation with TF-IDF features.
 - Python module for text preprocessing: tokenization, stemming (with ability to choose different parameters and strategies).
@@ -31,9 +29,24 @@ Basic vector space retreival ranking implementation with TF-IDF features.
 ### Weighted VSR zone ranking
 **Directory:** 3_vsr_zones
 
-**Input:** NIPS dataset
-
 **Deliverables**
 Implementation of VSR ranking with zone weights.
 - Python module for (d, q) pair scoring.
 - Jupyter Notebook for module demonstration.
+
+### Similarity punishment
+**Directory:** 4_sim_punishment
+
+**Deliverables**
+Algorithm for score punishment of near-duplicates in the retreival list.
+- Jupyter notebook with different possible implementations.
+- Modification of ranking module.
+
+### Automated zone-weight infering
+
+**Directory:** 5_zone_weight_learning
+
+**Deliverables**
+Algorithm for automated calculation of zone-weights based on user response.
+- Jupyter Notebook with implementation.
+- Modification of ranking module.
