@@ -105,6 +105,8 @@ def get_author_texts(paper_authors):
 
 author_texts = get_author_texts(paper_authors)
 
-for author, author_texts in author_texts:
+print('Author texts extracted successfully')
+
+for author, author_texts in author_texts.values():
     sanitized = get_text_keywords_sanitized(author_texts)
     build_models(sanitized, savefile_prefix=int(author))
