@@ -1,0 +1,7 @@
+*.dict
+*.lda
+*.npy
+*.id2word
+*.state
+*.mm
+*.index
