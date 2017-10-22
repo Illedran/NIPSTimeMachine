@@ -37,7 +37,7 @@ def teardown_db(exception):
         db.close()
 
 
-def retreive_results(query, n=10):
+def retrieve_results(query, n=10):
     engine = get_engine()
     ids = engine.get_best_matches(query, n)
     db = get_db()
@@ -76,7 +76,7 @@ def index():
 def search():
     query = request.args.get('q', 'machine learning')
 
-    search_results = retreive_results(query)
+    search_results = retrieve_results(query)
     search_results = [{'title': res[0], 'year': res[1]} for res in
                       search_results]
     return render_template('search.html',
