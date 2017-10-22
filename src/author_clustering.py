@@ -16,6 +16,9 @@ author_names = {}
 # Key: author id. Value: List of paper id's of that author
 author_papers = defaultdict(lambda: [])
 
+# Key: Paper id. Value: List of author id's who collaborated on that paper
+paper_authors = defaultdict(lambda: [])
+
 author_csv_count = 0
 
 # Fill the author_names dictionary
@@ -34,6 +37,7 @@ with open('../nips-data/paper_authors.csv', 'r') as csv_file:
     paper_reader = csv.DictReader(csv_file, delimiter=',')
     for paper in paper_reader:
         author_papers[paper['author_id']].append(paper['paper_id'])
+        paper_authors[paper['paper_id']].append(paper['author_id'])
 
 # Check data validity
 assert len(author_names) == len(author_papers)
@@ -66,3 +70,34 @@ print(kmeans.cluster_centers_)
 unique, counts = np.unique(kmeans.labels_, return_counts=True)
 print('Number of authors belonging to each cluster:',
       dict(zip(unique, counts)))
+
+
+def get_author_texts(paper_authors):
+    """
+    Parameters
+    ----------
+    Dictionary, where:
+        key: Paper ID.
+        value: List of all authors who collaborated on that paper.
+
+    Returns
+    -------
+    Dictionary, where:
+        key: Author ID.
+        value: List with all the papers content of that author.
+    """
+    texts = defaultdict(lambda: [])
+
+    with open('../nips-data/papers.csv', 'r') as csv_file:
+        papers = csv.DictReader(csv_file)
+        # Get paper-year allocation
+        for paper in papers:
+            paper_id = paper.get('id')
+            paper_text = paper.get('paper_text')
+            authors = paper_authors[paper_id]
+            for author in authors:
+                texts[author].append(paper_text)
+
+    return texts
+
+author_texts = get_author_texts(paper_authors)
