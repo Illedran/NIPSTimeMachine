@@ -1,25 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>NIPSTimeMachine</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <img src="{{ url_for('static', filename='logo_classic.png') }}" class="logo_image" />
-        <h4 align="center">Everything you want to now and most likely even more</h4>
-        <form action="/search" method="GET">
-            <input type="text" name="q" size="60" class="query_input" value="{{ query }}" />
-            <input type="submit" name="" value="I'm feeling lucky" />
-        </form>
+{% extends "base.html" %}
+{% block title %}{{ query }}{% endblock %}
+{% block main %}
+<div class="jumbotron">
+    <img src="{{ url_for('static', filename='logo_classic.png') }}"
+         class="logo_image"/>
+    <h4 align="center">Everything you want to know and most likely even
+        more</h4>
+</div>
 
-        <div class="search_container">
-            {% for res in search_results %}
-            <div class="search_result">
-                <h5><span class="year">{{ res.year }}</span> {{ res.title }}</h5>
-            </div>
-            {%endfor%}  
+<div class="row">
+    <form action="/search" class="search_form" method="GET">
+        <div class="form-group">
+            <input type="text" name="q" class="form-control"
+                   placeholder="Enter query..."/>
         </div>
-    </div>  
-</body>
-</html>
+        <div class="form-group text-right">
+            <input type="submit" class="btn btn-success" name=""
+                   value="I'm feeling lucky"/>
+        </div>
+    </form>
+</div>
+
+<div class="search_container marketing">
+    <div class="row">
+        {% for res in search_results %}
+        <div class="col-sm-4">
+            <div class="card text-center">
+                <div class="card-block">
+                    <h5 class="card-title">{{ res.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ res.year
+                        }}</h6>
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+    </div>
+</div>
+{% endblock %}

@@ -1,23 +1,30 @@
-body {
-    margin: 0;
-    padding: 0;
+.stats, .chart {
+    padding-top: 30px;
 }
 
-.container {
-    width: 50%;
-    margin: auto;
-    margin-top: 100px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-}
-
-.search_container {
+.author {
+    padding-top: 15px;
 }
 
 .logo_image {
     max-width: 100%;
     height: auto;
     margin: auto;
+}
+
+.error {
+    color: #f00;
+}
+
+.search_form {
+    width: 100%;
+}
+
+.card {
+    padding: 5px;
+    margin: 5px;
+}
+
+.card:hover {
+    border-color: darkcyan;
 }
