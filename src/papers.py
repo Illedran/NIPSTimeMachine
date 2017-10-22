@@ -23,7 +23,7 @@ def get_texts():
     papers = csv.DictReader(csv_file)
     # Get paper-year allocation
     for paper in papers:
-      texts.append(paper.get('text'))
+      texts.append(paper.get('paer_text'))
 
   return texts
 
