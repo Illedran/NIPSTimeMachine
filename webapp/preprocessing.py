@@ -1,5 +1,6 @@
 import nltk
 
+
 class BasicTokenizer:
     '''
     Uses NLTK word_toknizer, with conversion to lower case.
@@ -56,7 +57,6 @@ class Preprocessor:
         self.stemmer = SnowballStemmer()
 
     def process(self, text):
-        text = text.lower()
         tokens = self.tokenizer.tokenize(text)
         tokens = self.filter.filt(tokens)
         tokens = self.stemmer.stem(tokens)
