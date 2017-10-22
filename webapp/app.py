@@ -2,10 +2,15 @@ from flask import Flask, render_template, request, g
 from sqlite3 import connect
 from engine import BasicEngine
 from authors import Authors
+from qbe import get_pdf_text
 
 app = Flask(__name__)
 app.debug = True
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx'}
 
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db_path = '../nips-data/database.sqlite'
 
 
@@ -67,11 +72,6 @@ def retrieve_author_info(author_ids):
     return results
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
 @app.route('/search')
 def search():
     query = request.args.get('q', 'machine learning')
@@ -83,6 +83,21 @@ def search():
                            query=query,
                            search_results=search_results)
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/qbe', methods=['POST'])
+def qbe():
+    pdf_text = get_pdf_text(request.files['file'])
+    search_results = retrieve_results(pdf_text)
+
+    search_results = [{'title': res[0], 'year': res[1]} for res in
+                      search_results]
+    return render_template('search.html',
+                           search_results=search_results)
 
 @app.route('/authors')
 def authors():
@@ -110,6 +125,11 @@ def authors():
                                papers=papers,
                                coauthors=coauthors,
                                keywords=keywords)
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
