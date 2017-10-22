@@ -31,26 +31,31 @@ class BasicVSRanker:
         query = self.vectorizer.transform([" ".join(query)])
         return query
 
-    def get_best_matches(self, query, n=10):
-        query = self.process_query(query)
-        return np.argsort(
-            -self.similarity_function(query, self.vectorized_texts)
-        ).flatten()[:n]
-
     def get_scores(self, query):
         query = self.process_query(query)
         return self.similarity_function(query, self.vectorized_texts)
 
+    def get_best_matches(self, query, n=10):
+        scores = self.get_scores(query)
+        return np.argsort(-scores).flatten()[:n]
 
-class ZoneVSRRanker:
+
+class EnsembleRanker:
 
     def __init__(self):
-        self.zones = {}
+        self.rankers = []
+        self.weights = []
 
-    def add_zone_text(self, texts, prepr=Preprocessor()):
-        ranker = BasicVSRanker.from_raw(texts, prepr)
-        self.zones.append(ranker)
+    def add_ranker(self, ranker, weigth):
+        self.rankers.append(ranker)
+        self.weights.append(weight)
 
-    def add_zone_tokenized(self, tokenized):
-        ranker = BasicVSRanker.from_raw(texts, prepr)
-        self.zones.append(ranker)
+    def get_scores(self, query):
+        scores = []
+        for r, w in zip(self.rankers, self.weights):
+            scores.append(r.get_scores(query) * w)
+        return sum(scores)
+
+    def get_best_matches(self, query, n=10):
+        scores = self.get_scores(query)
+        return np.argsort(-scores).flatten()[:n]
