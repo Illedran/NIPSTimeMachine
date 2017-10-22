@@ -46,7 +46,7 @@ class EnsembleRanker:
         self.rankers = []
         self.weights = []
 
-    def add_ranker(self, ranker, weigth):
+    def add_ranker(self, ranker, weight):
         self.rankers.append(ranker)
         self.weights.append(weight)
 
