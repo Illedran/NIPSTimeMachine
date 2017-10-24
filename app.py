@@ -154,17 +154,17 @@ def authors():
     else:
         search_results = retrieve_author_info(author_ids)
         papers = [{'year': paper[0], 'title': paper[1]} for paper in
-                  search_results['papers']][:10]
+                  search_results['papers']][:9]
         coauthors = [{'name': coauthor,
                       'count': search_results['coauthors'][coauthor]} for
                      coauthor in search_results['coauthors']][:10]
         papers_by_year = [{'year': year, 'count': search_results['years'][year]}
                           for year in search_results['years']]
-        keywords = search_results['keywords'][:10]
+        keywords = search_results['keywords'][:20]
         similar_authors = search_results['similar_authors']
         similar_papers = [{'title': title,
                            'year': search_results['similar_papers'][title]} for
-                          title in search_results['similar_papers']][:10]
+                          title in search_results['similar_papers']][:9]
         rating = search_results['citation_rating']
         return render_template('authors.html',
                                error=None,

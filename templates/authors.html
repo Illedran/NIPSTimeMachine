@@ -4,6 +4,7 @@
     {{ super() }}
     <link rel="stylesheet"
           href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud-1.0.4.min.js"></script>
 {% endblock %}
 {% block main %}
     <div class="jumbotron">
@@ -27,32 +28,12 @@
         <hr/>
         <div class="row">
             <div class="col-12">
-                <h2>Papers</h2>
-                {% for paper in papers %}
-                    <div class="search_result">
-                        <h5><span
-                                class="year">{{ paper.year }}</span> {{ paper.title }}
-                        </h5>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <hr/>
-        <div class="row">
-            <div class="col-12">
-                <h2>Similar papers</h2>
-                {% for similar_paper in similar_papers %}
-                    <div class="search_result">
-                        <h5><span
-                                class="year">{{ similar_paper.year }}</span> {{ similar_paper.title }}
-                        </h5>
-                    </div>
-                {% endfor %}
+                <div class="js-wordle wordle" style="width: 800px; height: 200px;"></div>
             </div>
         </div>
         <div class="row stats">
-            <div class="col-md-4">
-                <h4>Similar authors</h4>
+            <div class="col-md-6 text-center">
+                <h2>Similar authors</h2>
                 <ul>
                     {% for similar_author in similar_authors %}
                         <li>
@@ -61,8 +42,8 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h4>Common co-authors</h4>
+            <div class="col-md-6 text-center">
+                <h2>Common co-authors</h2>
                 <ul>
                     {% for coauthor in coauthors %}
                         <li>
@@ -71,21 +52,40 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h4>Keywords</h4>
-                <ul>
-                    {% for keyword in keywords %}
-                        <li>{{ keyword }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
         </div>
         <div class="row chart">
             <div class="col-12">
-                <h4>Paper count by year</h4>
+                <h2>Paper count by year</h2>
                 <div class="js-years-chart">
                 </div>
             </div>
+        </div>
+        <h2>Papers</h2>
+        <div class="row">
+            {% for paper in papers %}
+                <div class="col-4">
+                    <div class="card text-center">
+                        <div class="card-block">
+                            <h5 class="card-title">{{ paper.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ paper.year }}</h6>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <hr/>
+        <h2>Similar papers</h2>
+        <div class="row">
+            {% for similar_paper in similar_papers %}
+                <div class="col-4">
+                    <div class="card text-center">
+                        <div class="card-block">
+                            <h5 class="card-title">{{ similar_paper.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ similar_paper.year }}</h6>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
@@ -93,6 +93,16 @@
 
 {% block scripts %}
     <script type="text/javascript">
+        {% if keywords %}
+            var keywords = {{ keywords|tojson|safe }};
+            var wordles = [];
+            for (var i = 0; i < keywords.length; i++) {
+                wordles.push({ text: keywords[i], weight: ((keywords.length - i) * 100) });
+            }
+            $(function() {
+                $(".js-wordle").jQCloud(wordles);
+            });
+        {% endif %}
         {% if papers_by_year %}
             $(document).ready(function () {
                 drawChart({{ papers_by_year|tojson|safe }});
