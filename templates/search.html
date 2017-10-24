@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 {% block title %}{{ query }}{% endblock %}
 {% block main %}
-<div class="jumbotron">
-    <img src="{{ url_for('static', filename='logo_classic.png') }}"
-         class="logo_image"/>
-    <h4 align="center">Everything you want to know and most likely even
-        more</h4>
-</div>
-
-{% include "search_form.html" %}
-
-<div class="search_container marketing">
-    <div class="row">
-        {% for res in search_results %}
-        <div class="col-4">
-            <div class="card text-center">
-                <div class="card-block">
-                    <h5 class="card-title">{{ res.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ res.year }}</h6>
-                </div>
-            </div>
-        </div>
-        {%endfor%}
+    <div class="jumbotron">
+        <img src="{{ url_for('static', filename='logo_classic.png') }}"
+             class="logo_image"/>
+        <h4 align="center">Everything you want to know and most likely even
+            more</h4>
     </div>
-</div>
+
+    {% include "search_form.html" %}
+
+    <div class="search_container marketing">
+        <div class="row">
+            {% for res in search_results %}
+                <div class="col-4">
+                    <div class="card text-center">
+                        <div class="card-block">
+                            <h5 class="card-title">{{ res.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ res.year }}</h6>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

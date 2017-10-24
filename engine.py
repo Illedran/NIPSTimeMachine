@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+__author__ = "Egor Lomagin"
+
 import pickle
+
 
 class BasicEngine:
     def __init__(self):

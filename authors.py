@@ -45,7 +45,7 @@ class Authors:
 
     def get_author_paper_ids(self, author_ids, db):
         # Retrieve relevant paper ids for the author
-        sql_query = 'select paper_id from paper_authors where author_id in (' + ','.join(
+        sql_query = 'SELECT paper_id FROM paper_authors WHERE author_id IN (' + ','.join(
             (str(i) for i in author_ids)) + ')'
         paper_ids = db.execute(sql_query).fetchall()
         paper_ids = [p[0] for p in paper_ids]
@@ -55,7 +55,7 @@ class Authors:
     def get_relevant_papers(self, author_ids, db):
         # Retrieve papers of the author
         paper_ids = self.get_author_paper_ids(author_ids, db)
-        sql_query = 'select * from papers where id in (' + ','.join(
+        sql_query = 'SELECT * FROM papers WHERE id IN (' + ','.join(
             (str(i) for i in paper_ids)) + ')'
         results = db.execute(sql_query).fetchall()
         results = {r[0]: r[1:] for r in results}
@@ -73,7 +73,7 @@ class Authors:
     def get_coauthor_ids(self, author_ids, db):
         coauthors = defaultdict(lambda: 0)
         paper_ids = self.get_author_paper_ids(author_ids, db)
-        sql_query = 'select author_id from paper_authors where paper_id in (' + ','.join(
+        sql_query = 'SELECT author_id FROM paper_authors WHERE paper_id IN (' + ','.join(
             (str(i) for i in paper_ids)) + ')'
         results = db.execute(sql_query).fetchall()
         results = [r[0] for r in results]
@@ -87,7 +87,7 @@ class Authors:
         # Get co-authors with collab count
         coauthors_with_count = {}
         coauthors, coauthor_ids = self.get_coauthor_ids(author_ids, db)
-        sql_query = 'select id, name from authors where id in (' + ','.join(
+        sql_query = 'SELECT id, name FROM authors WHERE id IN (' + ','.join(
             (str(i) for i in coauthor_ids)) + ')'
         results = db.execute(sql_query).fetchall()
         results = {r[0]: r[1] for r in results}
@@ -162,7 +162,7 @@ class Authors:
 
     def get_similar_papers(self, author_ids, db):
         similar_paper_ids = self.get_similar_paper_ids(author_ids, db)
-        sql_query = 'select title, year from papers where id in (' + ','.join(
+        sql_query = 'SELECT title, year FROM papers WHERE id IN (' + ','.join(
             (str(i) for i in similar_paper_ids)) + ')'
         similar_papers = db.execute(sql_query).fetchall()
         similar_papers = {similar_paper[0]: similar_paper[1] for similar_paper
@@ -172,11 +172,11 @@ class Authors:
 
     def get_similar_authors(self, author_ids, db):
         similar_paper_ids = self.get_similar_paper_ids(author_ids, db)
-        sql_query = 'select author_id from paper_authors where paper_id in (' + ','.join(
+        sql_query = 'SELECT author_id FROM paper_authors WHERE paper_id IN (' + ','.join(
             (str(i) for i in similar_paper_ids)) + ')'
         results = db.execute(sql_query).fetchall()
         results = [r[0] for r in results]
-        sql_query = 'select name FROM authors WHERE id in (' + ','.join(
+        sql_query = 'SELECT name FROM authors WHERE id IN (' + ','.join(
             (str(i) for i in results[:10])) + ');'
         similar_authors = db.execute(sql_query).fetchall()
         similar_authors = [similar_author[0] for similar_author in

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Homepage{% endblock %}
 {% block main %}
-<div class="jumbotron">
-    <img src="{{ url_for('static', filename='logo_classic.png') }}"
-         class="logo_image"/>
-    <h4 align="center">Everything you want to know and most likely even
-        more</h4>
-</div>
+    <div class="jumbotron">
+        <img src="{{ url_for('static', filename='logo_classic.png') }}"
+             class="logo_image"/>
+        <h4 align="center">Everything you want to know and most likely even
+            more</h4>
+    </div>
 
-{% include "search_form.html" %}
+    {% include "search_form.html" %}
 {% endblock %}

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = "Guillermo Alonso"
+
 """
 In this module we will explore author clustering. Note that at first I will
 be reading the data from the ``.csv`` files instead of the sqlite database.

@@ -20,17 +20,5 @@ def _handle_upload(file_upload):
             return ''.join(pdftotext.PDF(tmp))
 
 
-# def get_pdf_text(request_files):
-#     with io.BytesIO() as inf, io.StringIO() as outstring:
-#         request_files.save(inf)
-#         inf.seek(0)
-#         rscrmgr = PDFResourceManager(caching=True)
-#         laparams = LAParams()
-#         device = TextConverter(rscrmgr, outstring, laparams=laparams)
-#         process_pdf(rscrmgr, device, inf, set(), 0, caching=True,
-#                     check_extractable=True)
-#         return outstring.getvalue()
-
-
 def get_pdf_text_simple(request_files):
     return '\n\n'.join((_handle_upload(f) for f in request_files))

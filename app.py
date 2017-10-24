@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+__author__ = "Andrea Nardelli, Egor Lomagin"
+
 from sqlite3 import connect
 
 from flask import Flask, render_template, request, g
@@ -5,7 +8,6 @@ from flask import Flask, render_template, request, g
 from authors import Authors
 from engine import BasicEngine
 from qbe import get_pdf_text_simple
-from IPython import embed
 
 app = Flask(__name__)
 app.debug = True

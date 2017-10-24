@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 __author__ = "Andrea Nardelli"
 
-import nltk
 import re
 from abc import ABC, abstractmethod
+
+import nltk
 
 
 class Stemmer(ABC):
