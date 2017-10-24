@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-from webapp.preprocessing import Preprocesser
 import re
-import pandas as pd
-from fuzzywuzzy import fuzz
+
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
+from fuzzywuzzy import fuzz
+
+from preprocessing import Preprocesser
+
 data = pd.read_csv('nips-data/papers.csv')
 abstract_cleaner = re.compile(r'(- \n)|(\n)')
 

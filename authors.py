@@ -1,8 +1,11 @@
 # Author: Krists Kreics
 import operator
 from collections import defaultdict, OrderedDict
-from preprocessing import Preprocesser
+
 import gensim
+
+from preprocessing import Preprocessor
+
 
 # Check for numbers in text
 def is_number(n):
@@ -11,6 +14,7 @@ def is_number(n):
         return True
     except:
         return False
+
 
 class Authors:
     def retrieve(self, name, db):
@@ -35,7 +39,8 @@ class Authors:
 
     def get_author_paper_ids(self, author_ids, db):
         # Retrieve relevant paper ids for the author
-        sql_query = 'select paper_id from paper_authors where author_id in (' + ','.join((str(i) for i in author_ids)) + ')'
+        sql_query = 'select paper_id from paper_authors where author_id in (' + ','.join(
+            (str(i) for i in author_ids)) + ')'
         paper_ids = db.execute(sql_query).fetchall()
         paper_ids = [p[0] for p in paper_ids]
 
@@ -44,9 +49,10 @@ class Authors:
     def get_relevant_papers(self, author_ids, db):
         # Retrieve papers of the author
         paper_ids = self.get_author_paper_ids(author_ids, db)
-        sql_query = 'select * from papers where id in (' + ','.join((str(i) for i in paper_ids)) + ')'
+        sql_query = 'select * from papers where id in (' + ','.join(
+            (str(i) for i in paper_ids)) + ')'
         results = db.execute(sql_query).fetchall()
-        results = {r[0] : r[1:] for r in results}
+        results = {r[0]: r[1:] for r in results}
 
         return [results[i] for i in paper_ids]
 
@@ -61,11 +67,13 @@ class Authors:
     def get_coauthor_ids(self, author_ids, db):
         coauthors = defaultdict(lambda: 0)
         paper_ids = self.get_author_paper_ids(author_ids, db)
-        sql_query = 'select author_id from paper_authors where paper_id in (' + ','.join((str(i) for i in paper_ids)) + ')'
+        sql_query = 'select author_id from paper_authors where paper_id in (' + ','.join(
+            (str(i) for i in paper_ids)) + ')'
         results = db.execute(sql_query).fetchall()
         results = [r[0] for r in results]
         for cid in set(results):
-            if results.count(cid) > 2 and cid not in author_ids: coauthors[cid] = results.count(cid)
+            if results.count(cid) > 2 and cid not in author_ids: coauthors[
+                cid] = results.count(cid)
 
         return (coauthors, set(results))
 
@@ -73,14 +81,18 @@ class Authors:
         # Get co-authors with collab count
         coauthors_with_count = {}
         coauthors, coauthor_ids = self.get_coauthor_ids(author_ids, db)
-        sql_query = 'select id, name from authors where id in (' + ','.join((str(i) for i in coauthor_ids)) + ')'
+        sql_query = 'select id, name from authors where id in (' + ','.join(
+            (str(i) for i in coauthor_ids)) + ')'
         results = db.execute(sql_query).fetchall()
-        results = {r[0] : r[1] for r in results}
+        results = {r[0]: r[1] for r in results}
         for coauthor in coauthors:
             for r in results:
-                if r == coauthor: coauthors_with_count[results[r]] = coauthors[coauthor]
+                if r == coauthor: coauthors_with_count[results[r]] = coauthors[
+                    coauthor]
 
-        return OrderedDict(sorted(coauthors_with_count.items(), key=operator.itemgetter(1), reverse=True))
+        return OrderedDict(
+            sorted(coauthors_with_count.items(), key=operator.itemgetter(1),
+                   reverse=True))
 
     def get_years(self, author_ids, db):
         years = defaultdict(lambda: 0)
@@ -92,7 +104,7 @@ class Authors:
 
     def get_text_tokens(self, author_texts):
         results = []
-        texts = Preprocesser.process(author_texts)
+        texts = Preprocessor.process(author_texts)
         for tokens in texts:
             terms = filter(lambda x: len(x) > 2 and not is_number(x), tokens)
             results.append(list(terms))
@@ -102,7 +114,8 @@ class Authors:
     def get_keywords(self, author_ids, db):
         papers_text = self.get_author_texts(author_ids, db)
 
-        return gensim.summarization.keywords(papers_text, ratio=0.05).split('\n')
+        return gensim.summarization.keywords(papers_text, ratio=0.05).split(
+            '\n')
 
     def get_topics(self, author_ids, db):
         # Download the missing files for the model here: https://failiem.lv/u/2gfgcp35

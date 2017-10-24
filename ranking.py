@@ -2,7 +2,8 @@
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from preprocessing import Preprocessor
+from preproc import Preprocessor
+
 
 class BasicVSRanker:
     @staticmethod
@@ -43,7 +44,6 @@ class BasicVSRanker:
 
 
 class EnsembleRanker:
-
     def __init__(self):
         self.rankers = []
         self.weights = []

@@ -1,9 +1,83 @@
 # -*- coding: utf-8 -*-
 import nltk
 import re
+from abc import ABC, abstractmethod
 
 
-class Preprocesser():
+class Stemmer(ABC):
+    """
+    Generic stemming interface
+    """
+
+    @abstractmethod
+    def stem(self, tokens):
+        raise NotImplementedError()
+
+
+class NoStemmer(Stemmer):
+    """
+    Stemmer that does nothing
+    """
+
+    def stem(self, tokens):
+        return tokens
+
+
+class SnowballStemmer(Stemmer):
+    """
+    Snowball stemmer from NLTK
+    """
+
+    def stem(self, tokens):
+        stemmer = nltk.stem.SnowballStemmer('english')
+        return map(stemmer.stem, tokens)
+
+
+class PorterStemmer(Stemmer):
+    """
+    Porter stemmer from NLTK
+    """
+
+    def stem(self, tokens):
+        stemmer = nltk.stem.PorterStemmer('english')
+        return map(stemmer.stem, tokens)
+
+
+class Tokenizer(ABC):
+    @abstractmethod
+    def tokenize(self, text):
+        return NotImplementedError()
+
+
+class NLTKTokenizer(Tokenizer):
+    """
+    Uses NLTK word tokenizer, with conversion to lower case.
+    """
+
+    def tokenize(self, text):
+        return nltk.word_tokenize(text.lower())
+
+
+class Filter(ABC):
+    @abstractmethod
+    def filter(self, tokens):
+        return NotImplementedError()
+
+
+class NLTKFilter(Filter):
+    """
+    Filters out stopwords from NLTK english stopword list
+    """
+
+    def __init__(self, language='english'):
+        self.stopwords = set(nltk.corpus.stopwords.words(language))
+
+    def filter(self, tokens):
+        return filter(lambda token: token not in self.stopwords and len(
+            token) > 1 and token.isalnum() and not token.isdigit(), tokens)
+
+
+class Preprocessing(object):
     """
     This class holds static methods for text preprocessing: such as abstract
     splitting. The following regexes are used in some of the functions.
@@ -15,15 +89,15 @@ class Preprocesser():
     newline_matcher = re.compile(
         r'(?<=[&{}\;\"\'\w\(\)\.\,\?\-\/\\<>])\n(?=[&{}\;\"\'\w\(\)\.\,\?\-\/\\<>])')
 
-    '''
+    """
     Match abstracts in two ways: either a paragraph before the introduction, 
     or the paragraph after "abstract"
-    '''
+    """
     abstract_matcher = re.compile(
         r'([+{}=*&\[\]<>\;\:\"\'\w \(\)\.\,\?\-\/\\]*\s*\d+\s*introduction)|(a[bm][es]?[tl]rac[tf][\s-]*[+{}*=&\[\]\;\:<>\"\'\w \(\)\.\,\?\-\/\\]*)',
         flags=re.IGNORECASE)
     # Remove before and including "abstract"
-    abstract_remover = re.compile(r'^.*(?i:a[bm][es]?[tl]rac[tf])',
+    abstract_remover = re.compile(r'^.*a[bm][es]?[tl]rac[tf]',
                                   flags=re.IGNORECASE)
     whitespace_remover = re.compile(r'^[-:\s]*?(?=[A-Z])')
 
@@ -49,22 +123,19 @@ class Preprocesser():
 
     @classmethod
     def tokenize(cls, text):
-        return nltk.word_tokenize(text)
+        return NLTKTokenizer().tokenize(text)
 
     @classmethod
-    def filter_stopwords(cls, tokens):
-        return filter(lambda token: token not in cls.stopwords and len(
-            token) > 1 and token.isalnum() and not token.isdigit(), tokens)
+    def filter(cls, tokens):
+        return NLTKFilter().filter(tokens)
 
     @classmethod
     def snowball_stemmer(cls, tokens):
-        stemmer = nltk.stem.SnowballStemmer('english')
-        return map(lambda token: stemmer.stem(token), tokens)
+        return SnowballStemmer().stem(tokens)
 
     @classmethod
     def porter_stemmer(cls, tokens):
-        stemmer = nltk.stem.PorterStemmer()
-        return map(lambda token: stemmer.stem(token), tokens)
+        return PorterStemmer.stem(tokens)
 
     @classmethod
     def process(cls, text, stopwords=True, stemming='porter'):
@@ -77,7 +148,7 @@ class Preprocesser():
         """
         tokens = cls.tokenize(text.lower())
         if stopwords:
-            tokens = cls.filter_stopwords(tokens)
+            tokens = cls.filter(tokens)
         if stemming is not None and stemming:
             stemming = stemming.lower()
             if stemming == 'porter':
@@ -89,62 +160,18 @@ class Preprocesser():
         return tokens
 
 
-
-
-class SnowballStemmer:
-    '''
-    Snowball stemmer from NLTK
-    '''
-
-    def stem(self, tokens):
-        stemmer = nltk.stem.SnowballStemmer('english')
-        return [stemmer.stem(t) for t in tokens]
-
-
-
-class BasicTokenizer:
-    '''
-    Uses NLTK word_toknizer, with conversion to lower case.
-    '''
-
-    def tokenize(self, text):
-        return [t for t in nltk.word_tokenize(text.lower())]
-
-
-class BasicFilter:
-    '''
-    Filters out stopwords from NLTK english stopword list
-    '''
-
-    def __init__(self):
-        self.stopwords = set(nltk.corpus.stopwords.words('english'))
-
-    def filt(self, tokens):
-        def good(t):
-            return (not t in self.stopwords
-                    and len(t) > 1
-                    and t.isalnum()
-                    and not t.isdigit())
-        return [t for t in tokens if good(t)]
-
-
-class NoStemmer:
-    '''
-    Stemmer that does nothing
-    '''
-
-class Preprocessor:
-    '''
+class Preprocessor(object):
+    """
     Adjustible text preprocessing pipeline
-    '''
+    """
 
     def __init__(self):
-        self.tokenizer = BasicTokenizer()
-        self.filter = BasicFilter()
-        self.stemmer = SnowballStemmer()
+        self.tokenizer = NLTKTokenizer()
+        self.filter = NLTKFilter()
+        self.stemmer = PorterStemmer()
 
     def process(self, text):
         tokens = self.tokenizer.tokenize(text)
-        tokens = self.filter.filt(tokens)
+        tokens = self.filter.filter(tokens)
         tokens = self.stemmer.stem(tokens)
         return tokens

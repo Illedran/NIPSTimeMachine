@@ -30,4 +30,4 @@ def _handle_upload(file_upload):
 
 
 def get_pdf_text_simple(request_files):
-    return '\n\n\n'.join((_handle_upload(f) for f in request_files))
+    return '\n\n'.join((_handle_upload(f) for f in request_files))

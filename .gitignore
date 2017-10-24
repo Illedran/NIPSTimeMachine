@@ -110,3 +110,5 @@ requirements.in
 index/
 .py.bak
 .ipynb_checkpoints/
+qbe_examples/
+Untitled.ipynb

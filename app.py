@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, g
 from sqlite3 import connect
-from engine import BasicEngine
+
+from flask import Flask, render_template, request, g
+
 from authors import Authors
+from engine import BasicEngine
 from qbe import get_pdf_text_simple
 
 app = Flask(__name__)
@@ -11,7 +13,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-db_path = '../nips-data/database.sqlite'
+db_path = 'nips-data/database.sqlite'
 
 
 def get_db():
@@ -99,6 +101,7 @@ def qbe():
     return render_template('search.html',
                            query="QBE",
                            search_results=search_results)
+
 
 @app.route('/authors')
 def authors():
