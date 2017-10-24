@@ -97,7 +97,73 @@ def get_author_texts(paper_authors):
 
     return texts
 
-author_texts = get_author_texts(paper_authors)
+
+def unit_vector(vector):
+    """
+    Returns the unit vector of the vector.
+    """
+    return vector / np.linalg.norm(vector)
+
+
+def angle_between(v1, v2):
+    """
+    Returns the angle in degrees between two vectors represented as a tuple.
+    """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)) * 180 / pi
+
+
+def apply_kmeans(data, cluster_count=20, debug=True):
+    if debug:
+        print('Applying K-means with K = {} ...'.format(cluster_count))
+
+    estimator = KMeans(n_clusters=cluster_count)
+    kmeans = estimator.fit(topic_relevance)
+
+    unique, counts = np.unique(kmeans.labels_, return_counts=True)
+    if debug:
+        print('Number of authors belonging to each cluster:',
+              dict(zip(unique, counts)))
+        print('Inertia: ', kmeans.inertia_)
+
+    return kmeans
+
+
+def calculate_angle_of_author(author_id):
+    # There are two choices: pass an author id, or pass an author name
+    if isinstance(author_id, int):
+        author_name = author_names[str(author_id)]
+        string_key = str(author_id)
+        int_key = author_id
+    if isinstance(author_id, str):
+        author_name = author_id
+        string_key = author_names[author_id]
+        int_key = int(string_key)
+    #TODO: change everything so that this shit works
+    print('Calculating similar authors to:', author_name)
+    a, b, c = None, None, None
+    L = []
+    # First, find the author
+    for other_id, vector, cluster in list_of_lists:
+        if str(other_id) == string_key:
+            a, b, c = other_id, vector, cluster
+            break
+
+    for other_id, vector, cluster in list_of_lists:
+        if str(other_id) == str(a) or cluster != c:
+            continue
+
+        angle = angle_between(b, vector)
+        L.append([other_id, angle])
+
+    for el in L:
+        el[0] = author_names[el[0]]
+
+    return sorted(L, key=lambda x: x[1])
+
+
+_author_texts = get_author_texts(paper_authors)
 
 # Load the model
 if not os.path.isfile('topics.dict') or not os.path.isfile('topics.lda'):
@@ -111,7 +177,7 @@ print('Model loaded successfully')
 if not os.path.isfile('author_distributions.pickle'):
     author_distributions = {}
 
-    for author, author_texts in author_texts.items():
+    for author, author_texts in _author_texts.items():
         query = dictionary.doc2bow(' '.join(author_texts).lower().split())
         author_distributions[author] = lda[query]
 
@@ -148,21 +214,6 @@ for a, b in list_of_lists:
     relevances.append(b)
 topic_relevance = np.array(relevances)
 
-def apply_kmeans(data, cluster_count=20, debug=True):
-    if debug:
-        print('Applying K-means with K = {} ...'.format(cluster_count))
-
-    estimator = KMeans(n_clusters=cluster_count)
-    kmeans = estimator.fit(topic_relevance)
-
-    unique, counts = np.unique(kmeans.labels_, return_counts=True)
-    if debug:
-        print('Number of authors belonging to each cluster:',
-              dict(zip(unique, counts)))
-        print('Inertia: ', kmeans.inertia_)
-
-    return kmeans
-
 kmeans = apply_kmeans(topic_relevance, cluster_count=10)
 
 print(kmeans.labels_)
@@ -179,55 +230,9 @@ for i in range(len(list_of_lists)):
 author_number = "Michael I. Jordan"
 print('List of lists info:', type(list_of_lists), len(list_of_lists), list_of_lists[0])
 
-def calculate_angle_of_author(author_id):
-    # There are two choices: pass an author id, or pass an author name
-    if isinstance(author_id, int):
-        author_name = author_names[str(author_id)]
-        string_key = str(author_id)
-        int_key = author_id
-    if isinstance(author_id, str):
-        author_name = author_id
-        string_key = author_names[author_id]
-        int_key = int(string_key)
-    #TODO: change everything so that this shit works
-    print('Calculating similar authors to:', author_name)
-    a, b, c = None, None, None
-    L = []
-    # First, find the author
-    for other_id, vector, cluster in list_of_lists:
-        if str(other_id) == string_key:
-            a, b, c = other_id, vector, cluster
-            break
-
-    for other_id, vector, cluster in list_of_lists:
-        if str(other_id) == str(a) or cluster != c:
-            continue
-
-        angle = angle_between(b, vector)
-        L.append([other_id, angle])
-
-    for el in L:
-        el[0] = author_names[el[0]]
-
-    return sorted(L, key=lambda x: x[1])
 
 
 
-
-
-def unit_vector(vector):
-    """
-    Returns the unit vector of the vector.
-    """
-    return vector / np.linalg.norm(vector)
-
-def angle_between(v1, v2):
-    """
-    Returns the angle in degrees between two vectors represented as a tuple.
-    """
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)) * 180 / pi
 
 similar_authors = calculate_angle_of_author(author_number)
 
