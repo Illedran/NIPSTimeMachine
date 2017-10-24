@@ -5,13 +5,16 @@ In this module we will explore author clustering. Note that at first I will
 be reading the data from the ``.csv`` files instead of the sqlite database.
 """
 from collections import defaultdict
+import os
+import sys
 import csv
 import numpy as np
+import gensim
+import pickle
+import matplotlib.pyplot as plt
 
+from math import pi
 from sklearn.cluster import KMeans
-
-from papers import get_text_keywords_sanitized
-from papers import build_models
 
 # Key: author id. Value: Author name
 author_names = {}
@@ -22,18 +25,12 @@ author_papers = defaultdict(lambda: [])
 # Key: Paper id. Value: List of author id's who collaborated on that paper
 paper_authors = defaultdict(lambda: [])
 
-author_csv_count = 0
-
 # Fill the author_names dictionary
 with open('../nips-data/authors.csv', 'r') as csv_file:
     auth_reader = csv.DictReader(csv_file, delimiter=',')
     for author in auth_reader:
-        author_csv_count += 1
         author_names[author['id']] = author['name']
-
-# Check data validity
-assert len(author_names) == author_csv_count
-print('The total number of authors is', author_csv_count)
+        author_names[author['name']] = author['id']
 
 # Fill the author_papers dictionary
 with open('../nips-data/paper_authors.csv', 'r') as csv_file:
@@ -41,9 +38,6 @@ with open('../nips-data/paper_authors.csv', 'r') as csv_file:
     for paper in paper_reader:
         author_papers[paper['author_id']].append(paper['paper_id'])
         paper_authors[paper['paper_id']].append(paper['author_id'])
-
-# Check data validity
-assert len(author_names) == len(author_papers)
 
 print('Internal dictionaries filled OK')
 
@@ -105,8 +99,129 @@ def get_author_texts(paper_authors):
 
 author_texts = get_author_texts(paper_authors)
 
-print('Author texts extracted successfully')
+# Load the model
+if not os.path.isfile('topics.dict') or not os.path.isfile('topics.lda'):
+    sys.exit('Could not find model files (topics.dict and topics.lda)')
 
-for author, author_texts in author_texts.items():
-    sanitized = get_text_keywords_sanitized(author_texts)
-    build_models(sanitized, savefile_prefix=int(author))
+dictionary = gensim.corpora.Dictionary.load('topics.dict')
+lda = gensim.models.ldamodel.LdaModel.load('topics.lda')
+print('Model loaded successfully')
+
+# If the author distributions is not present, we need to create it
+if not os.path.isfile('author_distributions.pickle'):
+    author_distributions = {}
+
+    for author, author_texts in author_texts.items():
+        query = dictionary.doc2bow(' '.join(author_texts).lower().split())
+        author_distributions[author] = lda[query]
+
+    print('Finished generating the distributions', len(author_distributions))
+    with open('author_distributions.pickle', 'wb') as handle:
+        pickle.dump(author_distributions, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+
+
+
+
+
+
+
+
+with open('author_distributions.pickle', 'rb') as handle:
+    author_distributions = pickle.load(handle)
+
+print('Length of author distribution:', len(author_distributions))
+
+list_of_lists = []
+
+for auth, dist in author_distributions.items():
+    topic_list = [auth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+    for topic, relevance in dist:
+        topic_list[1][topic] = relevance
+
+    list_of_lists.append(topic_list)
+
+relevances = []
+for a, b in list_of_lists:
+    relevances.append(b)
+topic_relevance = np.array(relevances)
+
+def apply_kmeans(data, cluster_count=20, debug=True):
+    if debug:
+        print('Applying K-means with K = {} ...'.format(cluster_count))
+
+    estimator = KMeans(n_clusters=cluster_count)
+    kmeans = estimator.fit(topic_relevance)
+
+    unique, counts = np.unique(kmeans.labels_, return_counts=True)
+    if debug:
+        print('Number of authors belonging to each cluster:',
+              dict(zip(unique, counts)))
+        print('Inertia: ', kmeans.inertia_)
+
+    return kmeans
+
+kmeans = apply_kmeans(topic_relevance, cluster_count=10)
+
+print(kmeans.labels_)
+
+# Add to each author its cluster
+for i in range(len(list_of_lists)):
+    list_of_lists[i].append(kmeans.labels_[i])
+
+
+
+# 330 michael jordan
+# 34 the one I was trying
+# 6338 the other michael jordan
+author_number = 6338
+print('List of lists info:', type(list_of_lists), len(list_of_lists), list_of_lists[0])
+
+def calculate_angle_of_author(author_id):
+    print('Calculating similar authors to:', author_names[str(author_id)])
+    a, b, c = None, None, None
+    L = []
+    # First, find the author
+    for other_id, vector, cluster in list_of_lists:
+        if str(other_id) == str(author_id):
+            a, b, c = other_id, vector, cluster
+            break
+
+    for other_id, vector, cluster in list_of_lists:
+        if str(other_id) == str(a) or cluster != c:
+            continue
+
+        angle = angle_between(b, vector)
+        L.append([other_id, angle])
+
+    for el in L:
+        el[0] = author_names[el[0]]
+
+    return sorted(L, key=lambda x: x[1])
+
+
+
+
+
+def unit_vector(vector):
+    """
+    Returns the unit vector of the vector.
+    """
+    return vector / np.linalg.norm(vector)
+
+def angle_between(v1, v2):
+    """
+    Returns the angle in degrees between two vectors represented as a tuple.
+    """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)) * 180 / pi
+
+similar_authors = calculate_angle_of_author(author_number)
+
+# Print the results
+print('Showing top 10 results (Author name, angle):')
+for i in range(10):
+    print(similar_authors[i])
