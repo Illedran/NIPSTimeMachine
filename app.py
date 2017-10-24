@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, g
 from authors import Authors
 from engine import BasicEngine
 from qbe import get_pdf_text_simple
+from authors import MultipleAuthorsFoundException, NoAuthorsFoundException
 
 app = Flask(__name__)
 app.debug = True
@@ -113,10 +114,16 @@ def qbe():
 def authors():
     query = request.args.get('q', 'Michael I. Jordan')
 
-    author_ids = retrieve_author_ids(query)
-    if type(author_ids) is str:
+    try:
+        author_ids = retrieve_author_ids(query)
+    except NoAuthorsFoundException as e:
         return render_template('authors.html',
-                               error=author_ids,
+                               error=e.message,
+                               query=query,
+                               search_results=[])
+    except MultipleAuthorsFoundException as e:
+        return render_template('authors.html',
+                               error=e.authors_names,
                                query=query,
                                search_results=[])
     else:
@@ -135,6 +142,7 @@ def authors():
                           title in search_results['similar_papers']][:10]
         rating = search_results['citation_rating']
         return render_template('authors.html',
+                               error=None,
                                papers_by_year=papers_by_year,
                                query=query,
                                papers=papers,

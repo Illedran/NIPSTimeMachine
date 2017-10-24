@@ -17,6 +17,8 @@ import gensim
 import numpy as np
 from sklearn.cluster import KMeans
 
+MODEL_DIR = 'models'
+DATA_DIR = 'nips-data'
 
 def get_author_texts(paper_authors):
     """
@@ -34,7 +36,7 @@ def get_author_texts(paper_authors):
     """
     texts = defaultdict(lambda: [])
 
-    with open('../nips-data/papers.csv', 'r') as csv_file:
+    with open(os.path.join(DATA_DIR, 'papers.csv')) as csv_file:
         papers = csv.DictReader(csv_file)
         # Get paper-year allocation
         for paper in papers:
@@ -89,7 +91,6 @@ def calculate_angle_of_author(author_id, author_names, list_of_lists):
         author_name = author_id
         string_key = author_names[author_id]
         int_key = int(string_key)
-    # TODO: change everything so that this shit works
     print('Calculating similar authors to:', author_name)
     a, b, c = None, None, None
     L = []
@@ -123,14 +124,14 @@ def get_similar_authors(author_number):
     paper_authors = defaultdict(lambda: [])
 
     # Fill the author_names dictionary
-    with open('../nips-data/authors.csv', 'r') as csv_file:
+    with open(os.path.join(DATA_DIR, 'authors.csv')) as csv_file:
         auth_reader = csv.DictReader(csv_file, delimiter=',')
         for author in auth_reader:
             author_names[author['id']] = author['name']
             author_names[author['name']] = author['id']
 
     # Fill the author_papers dictionary
-    with open('../nips-data/paper_authors.csv', 'r') as csv_file:
+    with open(os.path.join(DATA_DIR, 'paper_authors.csv')) as csv_file:
         paper_reader = csv.DictReader(csv_file, delimiter=',')
         for paper in paper_reader:
             author_papers[paper['author_id']].append(paper['paper_id'])
@@ -167,15 +168,16 @@ def get_similar_authors(author_number):
     _author_texts = get_author_texts(paper_authors)
 
     # Load the model
-    if not os.path.isfile('topics.dict') or not os.path.isfile('topics.lda'):
+    if not os.path.isfile(os.path.join(MODEL_DIR, 'topics.dict')) \
+            or not os.path.isfile(os.path.join(MODEL_DIR, 'topics.lda')):
         sys.exit('Could not find model files (topics.dict and topics.lda)')
 
-    dictionary = gensim.corpora.Dictionary.load('topics.dict')
-    lda = gensim.models.ldamodel.LdaModel.load('topics.lda')
+    dictionary = gensim.corpora.Dictionary.load(os.path.join(MODEL_DIR, 'topics.dict'))
+    lda = gensim.models.ldamodel.LdaModel.load(os.path.join(MODEL_DIR, 'topics.lda'))
     print('Model loaded successfully')
 
     # If the author distributions is not present, we need to create it
-    if not os.path.isfile('author_distributions.pickle'):
+    if not os.path.isfile(os.path.join(MODEL_DIR, 'author_distributions.pickle')):
         author_distributions = {}
 
         for author, author_texts in _author_texts.items():
@@ -184,11 +186,11 @@ def get_similar_authors(author_number):
 
         print('Finished generating the distributions',
               len(author_distributions))
-        with open('author_distributions.pickle', 'wb') as handle:
+        with open(os.path.join(MODEL_DIR, 'author_distributions.pickle'), 'wb') as handle:
             pickle.dump(author_distributions, handle,
                         protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open('author_distributions.pickle', 'rb') as handle:
+    with open(os.path.join(MODEL_DIR, 'author_distributions.pickle'), 'rb') as handle:
         author_distributions = pickle.load(handle)
 
     print('Length of author distribution:', len(author_distributions))
@@ -235,4 +237,4 @@ def get_similar_authors(author_number):
 
 
 if __name__ == '__main__':
-    get_similar_authors('Michael I. Jordan')
+    get_similar_authors('Cesare Furlanello')

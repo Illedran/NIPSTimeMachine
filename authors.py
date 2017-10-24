@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__author__ = "Krists Kreics"
+__author__ = "Krists Kreics, Andrea Nardelli"
 
 import operator
 import pickle
@@ -19,13 +19,24 @@ def is_number(n):
         return False
 
 
-class Authors:
+class MultipleAuthorsFoundException(BaseException):
+    def __init__(self, authors_names):
+        self.authors_names = authors_names
+
+class NoAuthorsFoundException(BaseException):
+    def __init__(self, query):
+        self.query = query
+        self.message = 'Could not find any authors for "%s"' % query
+
+
+class Authors(object):
     def retrieve(self, name, db):
         sql_query = 'SELECT id, name FROM authors WHERE name LIKE "%' + name + '%";'
         results = db.execute(sql_query).fetchall()
         unique_authors = [r[1] for r in results]
         results = [r[0] for r in results]
-        error_message = self.check_author_validity(set(unique_authors), name)
+        error_message = self.check_author_validity(list(set(unique_authors)),
+                                                   name)
 
         return error_message if len(error_message) > 0 else results
 
@@ -33,13 +44,9 @@ class Authors:
         # Make sure that only one author is matched.
         response = ''
         if len(authors) == 0:
-            response = 'Could not find any author named "{}"'.format(name)
-        elif len(authors) <= 10 and len(authors) > 1:
-            potential_authors = ', '.join(authors)
-            response = 'Different authors found. Did you mean one of these: ' + potential_authors
-        elif len(authors) > 10:
-            potential_authors = ', '.join(list(authors)[:10] + ['...'])
-            response = 'Different authors found. Did you mean one of these: ' + potential_authors
+            raise NoAuthorsFoundException(name)
+        elif len(authors) > 1:
+            raise MultipleAuthorsFoundException(authors)
 
         return response
 

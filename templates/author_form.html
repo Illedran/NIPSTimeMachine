@@ -1,11 +1,29 @@
-<div class="row">
+{% if error is string %}
+    <div class="row">
+        <div class="list-group col-6 offset-3" align="center">
+            <p class="list-group-item list-group-item-danger">
+                {{ error }}
+            </p>
+        </div>
+    </div>
+{% elif error is iterable %}
+    <div class="row">
+        <div id="authors_list" class="list-group col-6 offset-3" align="center">
+            <p class="list-group-item list-group-item-danger">
+                Different authors found. Did you mean one of these:
+            </p>
+            {% for author_name in error %}
+                <a style="display: none;" class="list-group-item list-group-item-action list-group-item-success"
+                   href="/authors?q={{ author_name }}">{{ author_name }}</a>
+            {% endfor %}
+            <a href="javascript:void(0)" id="show_more" class="list-group-item list-group-item-action list-group-item-info">
+                Show more
+            </a>
+        </div>
+    </div>
+{% endif %}
+<div class="row" style="margin-top: 10px">
     <div class="col-12">
-        {% if error %}
-            <h4 class="error" align="center">{{ error }}</h4>
-        {% else %}
-            <h4 align="center">Everything you want to know and most likely even
-                more</h4>
-        {% endif %}
         <form action="/authors" class="search_form" method="GET">
             <div class="form-group row">
                 <input type="text" style="width: 96%" name="q"
@@ -23,15 +41,15 @@
 {% block scripts %}
     <script type="application/javascript">
         $(document).ready(function () {
-            var file_input = $("#file");
-            var form = $("#search_form");
-            var file_icon = $("#file_icon");
-            file_input.on('change', function () {
-                form.submit();
+            var size_list = $("#authors_list a").length;
+            var x = 5;
+            $('#authors_list a:lt(' + x + ')').show();
+            $('#show_more').click(function () {
+                x = (x + 5 <= size_list) ? x + 5 : size_list;
+                $('#authors_list a:lt(' + x + ')').show();
+                if (x === size_list) {
+                    $('#show_more').hide();
+                }
             });
-            file_icon.on('click', function () {
-                file_input.click();
-            });
-        });
-    </script>
+        });    </script>
 {% endblock %}
