@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, g
 from sqlite3 import connect
 from engine import BasicEngine
 from authors import Authors
-from qbe import get_pdf_text
+from qbe import get_pdf_text_simple
 
 app = Flask(__name__)
 app.debug = True
@@ -91,12 +91,13 @@ def allowed_file(filename):
 
 @app.route('/qbe', methods=['POST'])
 def qbe():
-    pdf_text = get_pdf_text(request.files['file'])
+    pdf_text = get_pdf_text_simple(request.files.getlist('file'))
     search_results = retrieve_results(pdf_text)
 
     search_results = [{'title': res[0], 'year': res[1]} for res in
                       search_results]
     return render_template('search.html',
+                           query="QBE",
                            search_results=search_results)
 
 @app.route('/authors')
