@@ -2,6 +2,7 @@
 __author__ = "Krists Kreics"
 
 import operator
+import pickle
 from collections import defaultdict, OrderedDict
 
 import gensim
@@ -14,7 +15,7 @@ def is_number(n):
     try:
         float(n)
         return True
-    except:
+    except ValueError:
         return False
 
 
@@ -33,8 +34,11 @@ class Authors:
         response = ''
         if len(authors) == 0:
             response = 'Could not find any author named "{}"'.format(name)
-        if len(authors) > 1:
+        elif len(authors) <= 10 and len(authors) > 1:
             potential_authors = ', '.join(authors)
+            response = 'Different authors found. Did you mean one of these: ' + potential_authors
+        elif len(authors) > 10:
+            potential_authors = ', '.join(list(authors)[:10] + ['...'])
             response = 'Different authors found. Did you mean one of these: ' + potential_authors
 
         return response
@@ -116,20 +120,89 @@ class Authors:
     def get_keywords(self, author_ids, db):
         papers_text = self.get_author_texts(author_ids, db)
 
-        return gensim.summarization.keywords(papers_text, ratio=0.05).split(
+        return gensim.summarization.keywords(papers_text, ratio=0.75).split(
             '\n')
 
     def get_topics(self, author_ids, db):
-        # Download the missing files for the model here: https://failiem.lv/u/2gfgcp35
         top_topics = []
         papers_text = self.get_author_texts(author_ids, db)
         dictionary = gensim.corpora.Dictionary.load('./models/topics.dict')
-        corpus = gensim.corpora.MmCorpus('./models/corpus.mm')
+        corpus = gensim.corpora.MmCorpus('./models/topics.mm')
         query = dictionary.doc2bow(papers_text.lower().split())
         lda = gensim.models.ldamodel.LdaModel.load('./models/topics.lda')
         topics = lda[query]
         a = list(sorted(topics, key=lambda x: x[1]))
-        for i in range(3):
+        for i in range(min(len(a), 3)):
             top_topics.append(lda.print_topic(a[i][0]))
 
         return top_topics
+
+    def get_similar_paper_ids(self, author_ids, db):
+        similar_paper_ids = []
+        paper_ids = self.get_author_paper_ids(author_ids, db)
+        papers = self.get_relevant_papers(author_ids, db)
+        dictionary = gensim.corpora.Dictionary.load('./models/topics.dict')
+        corpus = gensim.corpora.MmCorpus('./models/topics.mm')
+        lda = gensim.models.ldamodel.LdaModel.load('./models/topics.lda')
+        similarity = gensim.similarities.MatrixSimilarity.load(
+            './models/similar_topics.index')
+        similar_cut = len(paper_ids) + 1
+        for paper in papers:
+            query = dictionary.doc2bow(paper[5].lower().split())
+            topics = lda[query]
+            s = similarity[topics]
+            s = sorted(enumerate(s), key=lambda item: -item[1])
+            s = s[:similar_cut]
+            for p in s:
+                if p[0] not in paper_ids:
+                    similar_paper_ids.append(p[0])
+                    break
+
+        return similar_paper_ids[:10]
+
+    def get_similar_papers(self, author_ids, db):
+        similar_paper_ids = self.get_similar_paper_ids(author_ids, db)
+        sql_query = 'select title, year from papers where id in (' + ','.join(
+            (str(i) for i in similar_paper_ids)) + ')'
+        similar_papers = db.execute(sql_query).fetchall()
+        similar_papers = {similar_paper[0]: similar_paper[1] for similar_paper
+                          in similar_papers}
+
+        return similar_papers
+
+    def get_similar_authors(self, author_ids, db):
+        similar_paper_ids = self.get_similar_paper_ids(author_ids, db)
+        sql_query = 'select author_id from paper_authors where paper_id in (' + ','.join(
+            (str(i) for i in similar_paper_ids)) + ')'
+        results = db.execute(sql_query).fetchall()
+        results = [r[0] for r in results]
+        sql_query = 'select name FROM authors WHERE id in (' + ','.join(
+            (str(i) for i in results[:10])) + ');'
+        similar_authors = db.execute(sql_query).fetchall()
+        similar_authors = [similar_author[0] for similar_author in
+                           similar_authors]
+
+        return similar_authors
+
+    def get_citation_rating(self, author_ids, db):
+        file = open('models/bindex.p', 'rb')
+        rating = 0
+        index = pickle.load(file)
+        results = []
+        papers = self.get_relevant_papers(author_ids, db)
+        for paper in papers:
+            useful = []
+            citations = []
+            stopped_tokens = list(Preprocessing.process_bindex(paper[1]))
+            for i in range(len(stopped_tokens) - 1):
+                biword = stopped_tokens[i] + ' ' + stopped_tokens[i + 1]
+                if biword in index: useful.append(index[biword])
+            for i in range(len(useful) - 1):
+                citations = list(set(useful[i]) & set(useful[i + 1]))
+            if len(citations) > 0: results.append(len(citations))
+        results = sorted(results)
+        if len(results) > 0:
+            for r in range(max(results)):
+                if len(list(filter(lambda x: x >= r, results))) >= r: rating = r
+
+        return rating

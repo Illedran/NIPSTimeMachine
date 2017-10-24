@@ -6,12 +6,6 @@
     padding-top: 15px;
 }
 
-.logo_image {
-    max-width: 100%;
-    height: auto;
-    margin: auto;
-}
-
 .error {
     color: #f00;
 }
@@ -33,4 +27,28 @@
 .fa-file-text:hover {
     cursor: pointer;
     color: darkcyan;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.logo_image {
+    max-width: 100%;
+    height: auto;
+    margin: auto;
+}
+
+table td {
+    padding: 4px;
+    border: 1px solid #000;
+}
+
+.chart .ct-series .ct-bar {
+    stroke: #000;
+}
+
+#file_icon {
+    margin-left: 15px;
 }

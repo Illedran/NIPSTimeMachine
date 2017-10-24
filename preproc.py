@@ -161,6 +161,14 @@ class Preprocessing(object):
                 raise Exception("Unsupported stemmer.")
         return tokens
 
+    @classmethod
+    def process_bindex(cls, text):
+        text = text.lower()
+        tokens = cls.tokenize(text)
+        tokens = cls.filter(tokens)
+
+        return tokens
+
 
 class Preprocessor(object):
     """

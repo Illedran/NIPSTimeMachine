@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, g
 from authors import Authors
 from engine import BasicEngine
 from qbe import get_pdf_text_simple
+from IPython import embed
 
 app = Flask(__name__)
 app.debug = True
@@ -71,6 +72,9 @@ def retrieve_author_info(author_ids):
     results['years'] = authors.get_years(author_ids, db)
     results['keywords'] = authors.get_keywords(author_ids, db)
     results['topics'] = authors.get_topics(author_ids, db)
+    results['similar_authors'] = authors.get_similar_authors(author_ids, db)
+    results['similar_papers'] = authors.get_similar_papers(author_ids, db)
+    results['citation_rating'] = authors.get_citation_rating(author_ids, db)
     return results
 
 
@@ -115,26 +119,33 @@ def authors():
                                search_results=[])
     else:
         search_results = retrieve_author_info(author_ids)
-        papers = [{'title': paper[0], 'year': paper[1]} for paper in
-                  search_results['papers']]
+        papers = [{'year': paper[0], 'title': paper[1]} for paper in
+                  search_results['papers']][:10]
         coauthors = [{'name': coauthor,
                       'count': search_results['coauthors'][coauthor]} for
                      coauthor in search_results['coauthors']][:10]
         papers_by_year = [{'year': year, 'count': search_results['years'][year]}
                           for year in search_results['years']]
         keywords = search_results['keywords'][:10]
+        similar_authors = search_results['similar_authors']
+        similar_papers = [{'title': title,
+                           'year': search_results['similar_papers'][title]} for
+                          title in search_results['similar_papers']][:10]
+        rating = search_results['citation_rating']
         return render_template('authors.html',
                                papers_by_year=papers_by_year,
                                query=query,
                                papers=papers,
+                               rating=rating,
+                               similar_papers=similar_papers,
                                coauthors=coauthors,
+                               similar_authors=similar_authors,
                                keywords=keywords)
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 if __name__ == '__main__':
     app.run()
