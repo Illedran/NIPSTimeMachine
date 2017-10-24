@@ -9,6 +9,7 @@ from preproc import Preprocessor
 
 
 class BasicVSRanker:
+
     @staticmethod
     def from_tokenized(texts, prepr=Preprocessor()):
         vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=1000)
@@ -44,6 +45,7 @@ class BasicVSRanker:
 
 
 class EnsembleRanker:
+
     def __init__(self):
         self.rankers = []
         self.weights = []
