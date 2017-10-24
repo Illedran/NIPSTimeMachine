@@ -176,16 +176,26 @@ for i in range(len(list_of_lists)):
 # 330 michael jordan
 # 34 the one I was trying
 # 6338 the other michael jordan
-author_number = 6338
+author_number = "Michael I. Jordan"
 print('List of lists info:', type(list_of_lists), len(list_of_lists), list_of_lists[0])
 
 def calculate_angle_of_author(author_id):
-    print('Calculating similar authors to:', author_names[str(author_id)])
+    # There are two choices: pass an author id, or pass an author name
+    if isinstance(author_id, int):
+        author_name = author_names[str(author_id)]
+        string_key = str(author_id)
+        int_key = author_id
+    if isinstance(author_id, str):
+        author_name = author_id
+        string_key = author_names[author_id]
+        int_key = int(string_key)
+    #TODO: change everything so that this shit works
+    print('Calculating similar authors to:', author_name)
     a, b, c = None, None, None
     L = []
     # First, find the author
     for other_id, vector, cluster in list_of_lists:
-        if str(other_id) == str(author_id):
+        if str(other_id) == string_key:
             a, b, c = other_id, vector, cluster
             break
 
