@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ query }}{% endblock %}
 {% block main %}
+    <div class="snippets js-snippets">
+        <img src="{{ url_for('static', filename='icon-close.png') }}" class="icon-close js-close"/>
+        <p class="card js-text"></p>
+    </div>
     <div class="jumbotron">
         <img src="{{ url_for('static', filename='logo_classic.png') }}"
              class="logo_image"/>
@@ -15,7 +19,7 @@
             {% for res in search_results %}
                 <div class="col-4">
                     <div class="card text-center">
-                        <div class="card-block">
+                        <div class="card-block js-card" data-snippets="{{res.snippets}}">
                             <h5 class="card-title">{{ res.title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ res.year }}</h6>
                         </div>
@@ -24,4 +28,14 @@
             {% endfor %}
         </div>
     </div>
+    <script type="text/javascript">
+        $('.search_container').on('click', '.js-card', function () {
+            $snippets = $('.js-snippets');
+            $snippets.find('.js-text').html($(this).data('snippets'));
+            $snippets.show();
+        });
+        $('.js-close').on('click', function () {
+            $(this).closest('.js-snippets').hide();
+        });
+    </script>
 {% endblock %}

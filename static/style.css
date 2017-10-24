@@ -52,3 +52,24 @@ table td {
 #file_icon {
     margin-left: 15px;
 }
+
+.snippets {
+    display: none;
+    position: fixed; z-index: 999;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, .5);
+    text-align: center;
+}
+
+.snippets p.card {
+    display: block; max-width: 720px;
+    margin-left: auto; margin-right: auto; margin-top: 100px;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.snippets .icon-close {
+    width: 50px;
+    position: absolute; left: 10px; top: 10px;
+    cursor: pointer;
+}
