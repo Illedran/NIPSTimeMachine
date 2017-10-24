@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pickle
 from tqdm import tqdm
 from sqlite3 import connect
 from preprocessing import Preprocessor
