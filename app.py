@@ -5,10 +5,11 @@ from sqlite3 import connect
 
 from flask import Flask, render_template, request, g
 
+import construct_index
 from authors import Authors
+from authors import MultipleAuthorsFoundException, NoAuthorsFoundException
 from engine import BasicEngine
 from qbe import get_pdf_text_simple
-from authors import MultipleAuthorsFoundException, NoAuthorsFoundException
 
 app = Flask(__name__)
 app.debug = True
@@ -48,15 +49,44 @@ def teardown_db(exception):
         db.close()
 
 
-def retrieve_results(query, n=10):
+def retrieve_results_1(query, n=10):
+    try:
+        results = construct_index.search(
+            query, search_field="paper_text", index_name="index_with_content")
+    except:
+        return retrieve_results_2(query, n)
+
+    engine = get_engine()
+    scores = engine.ranker.get_scores(query).flatten()
+    inv_ids = {v: k for k, v in enumerate(engine.ids_map)}
+
+    new_res = []
+
+    for i in range(results.scored_length()):
+        j = int(results[i]['id'])
+        new_res.append({
+            'id': results[i]['id'],
+            'title': results[i]['title'],
+            'year': results[i]['year'],
+            'paper_text': results[i]['paper_text'],
+            'snippets': results[i].highlights("paper_text"),
+            'score': scores[inv_ids[j]],
+        })
+
+    results = sorted(new_res, key=lambda x: x['score'], reverse=True)
+    return results[:n]
+
+
+def retrieve_results_2(query, n=10):
     engine = get_engine()
     ids = engine.get_best_matches(query, n)
     db = get_db()
-    sql_query = 'select id, title, year from papers where id in (' + ','.join(
+    sql_query = 'SELECT id, title, year FROM papers WHERE id IN (' + ','.join(
         (str(i) for i in ids)) + ')'
     results = db.execute(sql_query).fetchall()
     results = {r[0]: r[1:] for r in results}
-    return [results[i] for i in ids]
+    results = [results[i] for i in ids]
+    return [{'title': res[0], 'year': res[1]} for res in results]
 
 
 def retrieve_author_ids(query):
@@ -85,9 +115,7 @@ def retrieve_author_info(author_ids):
 def search():
     query = request.args.get('q', 'machine learning')
 
-    search_results = retrieve_results(query)
-    search_results = [{'title': res[0], 'year': res[1]} for res in
-                      search_results]
+    search_results = retrieve_results_1(query)
     return render_template('search.html',
                            query=query,
                            search_results=search_results)
@@ -101,10 +129,7 @@ def allowed_file(filename):
 @app.route('/qbe', methods=['POST'])
 def qbe():
     pdf_text = get_pdf_text_simple(request.files.getlist('file'))
-    search_results = retrieve_results(pdf_text)
-
-    search_results = [{'title': res[0], 'year': res[1]} for res in
-                      search_results]
+    search_results = retrieve_results_2(pdf_text)
     return render_template('search.html',
                            query="QBE",
                            search_results=search_results)
@@ -156,6 +181,7 @@ def authors():
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 if __name__ == '__main__':
     app.run()
