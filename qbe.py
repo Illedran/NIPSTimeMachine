@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+__author__ = "Andrea Nardelli"
+
 import io
-from IPython import embed
 import pdftotext
+
 import docx
+
 
 def _handle_upload(file_upload):
     with io.BytesIO() as tmp:

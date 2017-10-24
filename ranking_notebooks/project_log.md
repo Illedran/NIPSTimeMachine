@@ -1,4 +1,5 @@
 # Ranking/scoring system for NIPS dataset entities
+Student: Egor Lomagin
 
 ## Project description
 The goal of this project is to create ranking/scoring system for NIPS dataset entities and to integrate it into NIPS IR system developed in group. Given the search query this system should improve quality of search results i.e.:
@@ -34,6 +35,7 @@ Implementation of VSR ranking with zone weights.
 - Python module for (d, q) pair scoring.
 - Jupyter Notebook for module demonstration.
 
+<!--
 ### Build engine
 
 **Directory:** 4_engine
@@ -60,4 +62,4 @@ Algorithm for score punishment of near-duplicates in the retreival list.
 Algorithm for automated calculation of zone-weights based on user response.
 - Jupyter Notebook with implementation.
 - Modification of ranking module.
-
+-->

@@ -1,10 +1,12 @@
-# Author: Krists Kreics
+# -*- coding: utf-8 -*-
+__author__ = "Krists Kreics"
+
 import operator
 from collections import defaultdict, OrderedDict
 
 import gensim
 
-from preprocessing import Preprocessor
+from preproc import Preprocessing
 
 
 # Check for numbers in text
@@ -104,7 +106,7 @@ class Authors:
 
     def get_text_tokens(self, author_texts):
         results = []
-        texts = Preprocessor.process(author_texts)
+        texts = Preprocessing.process(author_texts)
         for tokens in texts:
             terms = filter(lambda x: len(x) > 2 and not is_number(x), tokens)
             results.append(list(terms))

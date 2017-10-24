@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+__author__ = "Andrea Nardelli"
+
 import nltk
 import re
 from abc import ABC, abstractmethod
@@ -39,7 +41,7 @@ class PorterStemmer(Stemmer):
     """
 
     def stem(self, tokens):
-        stemmer = nltk.stem.PorterStemmer('english')
+        stemmer = nltk.stem.PorterStemmer()
         return map(stemmer.stem, tokens)
 
 
@@ -175,3 +177,6 @@ class Preprocessor(object):
         tokens = self.filter.filter(tokens)
         tokens = self.stemmer.stem(tokens)
         return tokens
+
+    def process_texts(self, texts):
+        return [self.process(text) for text in texts]
