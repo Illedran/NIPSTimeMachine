@@ -74,7 +74,7 @@ def retrieve_results_1(query, n=10):
 
 
     results = sorted(new_res, key=lambda x: x['score'], reverse=True)
-    return results
+    return results[:n]
 
 
 def retrieve_results_2(query, n=10):
