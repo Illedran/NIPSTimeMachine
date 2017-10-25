@@ -5,12 +5,15 @@ from sqlite3 import connect
 
 from flask import Flask, render_template, request, g
 
+import pickle
 import construct_index
+import json
 from authors import Authors
 from authors import MultipleAuthorsFoundException, NoAuthorsFoundException
 from engine import BasicEngine
-from qbe import get_pdf_text_simple
+#from qbe import get_pdf_text_simple
 from query_extractor import QueryExtractor, Author
+from query_autocomplete import QueryAutocomplete
 
 app = Flask(__name__)
 app.debug = True
@@ -49,6 +52,13 @@ def get_query_extractor():
         db = get_db()
         qe = g._query_extractor = QueryExtractor(db)
     return qe
+
+def get_query_autocomplete():
+    qa = getattr(g, '_query_autocomplete', None)
+    if qa is None:
+        with open('models/autocomplete.pkl3', 'rb') as f:
+            qa = g._query_autocomplete = pickle.load(f)
+    return qa
 
 
 @app.teardown_appcontext
@@ -219,6 +229,16 @@ def authors():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/complete')
+def complete():
+    query = request.args.get('query', '')
+    suggestions = get_query_autocomplete().complete(query)
+    if suggestions:
+        result = {"suggestions": [{"value" : query + " " + s, "data" : ""} for s in suggestions]}
+    else:
+        result = {"suggestions": [{"value" : query, "data" : ""}]}
+    return json.dumps(result)
 
 
 if __name__ == '__main__':

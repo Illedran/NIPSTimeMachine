@@ -2,12 +2,19 @@
     <div class="col-11">
         <form action="/search" class="search_form" method="GET">
             <div class="form-group row">
-                <input type="text" name="q" class="form-control"
+                <input type="text" name="q" id="autocomplete" class="form-control"
                        placeholder="Enter query..."
                        value="{{ query }}" />
             </div>
         </form>
     </div>
+    <script type="text/javascript">
+        $('#autocomplete').autocomplete({
+        serviceUrl: '/complete',
+        zIndex: 0,
+        
+});
+    </script>
 
     <div class="col-1">
         <form method="POST" id="search_form" enctype="multipart/form-data"
