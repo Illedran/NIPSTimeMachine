@@ -10,6 +10,7 @@ from authors import Authors
 from authors import MultipleAuthorsFoundException, NoAuthorsFoundException
 from engine import BasicEngine
 from qbe import get_pdf_text_simple
+from query_extractor import QueryExtractor, Author
 
 app = Flask(__name__)
 app.debug = True
@@ -42,6 +43,14 @@ def get_authors():
     return authors
 
 
+def get_query_extractor():
+    qe = getattr(g, '_query_extractor', None)
+    if qe is None:
+        db = get_db()
+        qe = g._query_extractor = QueryExtractor(db)
+    return qe
+
+
 @app.teardown_appcontext
 def teardown_db(exception):
     db = getattr(g, '_database', None)
@@ -49,7 +58,7 @@ def teardown_db(exception):
         db.close()
 
 
-def retrieve_results_1(query, n=10):
+def retrieve_results_1(query, n=10, author_names=[], years=[]):
     try:
         results = construct_index.search(
             query, search_field="paper_text", index_name="index_with_content")
@@ -61,17 +70,33 @@ def retrieve_results_1(query, n=10):
     inv_ids = {v: k for k, v in enumerate(engine.ids_map)}
 
     new_res = []
+    db = get_db()
 
     for i in range(results.scored_length()):
         j = int(results[i]['id'])
+        authors = set([x[0].lower() for x in db.execute('''select name from authors
+                join paper_authors on authors.id = author_id
+                where paper_id = ?;''', [j]).fetchall()])
         new_res.append({
             'id': results[i]['id'],
             'title': results[i]['title'],
             'year': results[i]['year'],
+            'authors': authors,
             'paper_text': results[i]['paper_text'],
             'snippets': results[i].highlights("paper_text"),
             'score': scores[inv_ids[j]],
         })
+
+    for name in author_names:
+        for res in new_res:
+            if name in res['authors']:
+                res['score'] += 0.25
+
+    for year in years:
+        for res in new_res:
+            if res['year'] in years:
+                res['score'] += 0.25
+
 
     results = sorted(new_res, key=lambda x: x['score'], reverse=True)
     return results[:n]
@@ -95,7 +120,8 @@ def retrieve_author_ids(query):
     return authors.retrieve(query, db)
 
 
-# Retrieve info about the author, takes author_ids since one author can have 1+ entries
+# Retrieve info about the author, takes author_ids since one author can
+# have 1+ entries
 def retrieve_author_info(author_ids):
     authors = get_authors()
     db = get_db()
@@ -115,10 +141,22 @@ def retrieve_author_info(author_ids):
 def search():
     query = request.args.get('q', 'machine learning')
 
-    search_results = retrieve_results_1(query)
+    qe = get_query_extractor()
+
+    years = qe.extract_years(query)
+    author_id_names = qe.extract_authors(query)
+    author_names = [x[1] for x in author_id_names]
+
+    db = get_db()
+    authors = [Author(x[1], db) for x in author_id_names]
+    authors = sorted(authors, key=lambda x: x.paper_count, reverse=True)[:5]
+
+    search_results = retrieve_results_1(query, author_names=author_names, years=years)
+
     return render_template('search.html',
                            query=query,
-                           search_results=search_results)
+                           search_results=search_results,
+                           authors=authors)
 
 
 def allowed_file(filename):

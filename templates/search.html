@@ -14,14 +14,40 @@
 
     {% include "search_form.html" %}
 
+
+
+
     <div class="search_container marketing">
+        {% if authors %}
+        <div class="col-12 text-center">
+            <h4>Information about these authors might be interesting for you</h4>
+            <ul>
+                {% for author in authors %}
+                <li>
+                    <a href="{{ url_for('authors', q=author.name) }}">{{ author.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            
+        </div>
         <div class="row">
+            
+
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-12 text-center">
+                <h4>Search results</h4>
+            </div>
             {% for res in search_results %}
                 <div class="col-4">
                     <div class="card text-center">
                         <div class="card-block js-card" data-snippets="{{res.snippets}}">
                             <h5 class="card-title">{{ res.title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ res.year }}</h6>
+                            <h6 class="card-subtitle mb-2">
+                            {% for author in res.authors %}{{ author }}<br>{% endfor %}
+                            </h6>
                         </div>
                     </div>
                 </div>
