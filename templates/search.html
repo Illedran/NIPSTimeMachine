@@ -2,7 +2,8 @@
 {% block title %}{{ query }}{% endblock %}
 {% block main %}
     <div class="snippets js-snippets">
-        <img src="{{ url_for('static', filename='icon-close.png') }}" class="icon-close js-close"/>
+        <img src="{{ url_for('static', filename='icon-close.png') }}"
+             class="icon-close js-close"/>
         <p class="card js-text"></p>
     </div>
     <div class="jumbotron">
@@ -14,27 +15,27 @@
 
     {% include "search_form.html" %}
 
-
-
-
     <div class="search_container marketing">
         {% if authors %}
-        <div class="col-12 text-center">
-            <h4>Information about these authors might be interesting for you</h4>
-            <ul>
-                {% for author in authors %}
-                <li>
-                    <a href="{{ url_for('authors', q=author.name) }}">{{ author.name }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-            
-        </div>
-        <div class="row">
-            
-
-        </div>
+            <div class="row">
+                <div id="authors_list" class="list-group col-6 offset-3"
+                     align="center">
+                    <p class="list-group-item list-group-item-danger">
+                        Different authors found. Did you mean one of these:
+                    </p>
+                    {% for author in authors %}
+                        <a style="display: none;"
+                           class="list-group-item list-group-item-action list-group-item-success"
+                           href="{{ url_for('authors', q=author.name) }}">{{ author.name }}</a>
+                    {% endfor %}
+                    <a href="javascript:void(0)" style="display: none;" id="show_more"
+                       class="list-group-item list-group-item-action list-group-item-info">
+                        Show more
+                    </a>
+                </div>
+            </div>
         {% endif %}
+
         <div class="row">
             <div class="col-12 text-center">
                 <h4>Search results</h4>
@@ -42,11 +43,13 @@
             {% for res in search_results %}
                 <div class="col-4">
                     <div class="card text-center">
-                        <div class="card-block js-card" data-snippets="{{res.snippets}}">
+                        <div class="card-block js-card"
+                             data-snippets="{{ res.snippets }}">
                             <h5 class="card-title">{{ res.title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ res.year }}</h6>
                             <h6 class="card-subtitle mb-2">
-                            {% for author in res.authors %}{{ author }}<br>{% endfor %}
+                                {% for author in res.authors %}{{ author }}
+                                    <br>{% endfor %}
                             </h6>
                         </div>
                     </div>
@@ -55,13 +58,29 @@
         </div>
     </div>
     <script type="text/javascript">
-        $('.search_container').on('click', '.js-card', function () {
-            $snippets = $('.js-snippets');
-            $snippets.find('.js-text').html($(this).data('snippets'));
-            $snippets.show();
-        });
-        $('.js-close').on('click', function () {
-            $(this).closest('.js-snippets').hide();
+        $(document).ready(function () {
+            var size_list = $("#authors_list a").length - 1;
+            var x = 5;
+            $('#authors_list a:lt(' + x + ')').show();
+            if (size_list > x) {
+                $('#show_more').show();
+            }
+            $('#show_more').click(function () {
+                x = (x + 5 <= size_list) ? x + 5 : size_list;
+                $('#authors_list a:lt(' + x + ')').show();
+                if (x === size_list) {
+                    $('#show_more').hide();
+                }
+            });
+            $('.search_container').on('click', '.js-card', function () {
+                $snippets = $('.js-snippets');
+                $snippets.find('.js-text').html($(this).data('snippets'));
+                $snippets.show();
+            });
+            $('.js-close').on('click', function () {
+                $(this).closest('.js-snippets').hide();
+            });
+
         });
     </script>
 {% endblock %}

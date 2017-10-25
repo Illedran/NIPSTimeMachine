@@ -13,10 +13,12 @@
                 Different authors found. Did you mean one of these:
             </p>
             {% for author_name in error %}
-                <a style="display: none;" class="list-group-item list-group-item-action list-group-item-success"
+                <a style="display: none;"
+                   class="list-group-item list-group-item-action list-group-item-success"
                    href="/authors?q={{ author_name }}">{{ author_name }}</a>
             {% endfor %}
-            <a href="javascript:void(0)" id="show_more" class="list-group-item list-group-item-action list-group-item-info">
+            <a href="javascript:void(0)" style="display: none;" id="show_more"
+               class="list-group-item list-group-item-action list-group-item-info">
                 Show more
             </a>
         </div>
@@ -42,8 +44,13 @@
 {% block scripts %}
     <script type="application/javascript">
         $(document).ready(function () {
-            var size_list = $("#authors_list a").length;
+            var size_list = $("#authors_list a").length - 1;
+            console.log(size_list);
             var x = 5;
+            $('#authors_list a:lt(' + x + ')').show();
+            if (size_list > x) {
+                $('#show_more').show();
+            }
             $('#authors_list a:lt(' + x + ')').show();
             $('#show_more').click(function () {
                 x = (x + 5 <= size_list) ? x + 5 : size_list;
@@ -52,5 +59,6 @@
                     $('#show_more').hide();
                 }
             });
-        });    </script>
+        });
+    </script>
 {% endblock %}

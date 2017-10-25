@@ -2,8 +2,9 @@
     padding-top: 30px;
 }
 
-.author {
-    padding-top: 15px;
+#authors_list {
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .error {

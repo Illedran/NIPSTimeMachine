@@ -14,6 +14,7 @@ from engine import BasicEngine
 from qbe import get_pdf_text_simple
 from query_extractor import QueryExtractor, Author
 from query_autocomplete import QueryAutocomplete
+from IPython import embed
 
 app = Flask(__name__)
 app.debug = True
@@ -109,6 +110,8 @@ def retrieve_results_1(query, n=10, author_names=[], years=[]):
 
 
     results = sorted(new_res, key=lambda x: x['score'], reverse=True)
+    for res in results:
+        res['authors'] = list(map(lambda s: s.title(), res['authors']))
     return results[:n]
 
 
@@ -159,9 +162,12 @@ def search():
 
     db = get_db()
     authors = [Author(x[1], db) for x in author_id_names]
-    authors = sorted(authors, key=lambda x: x.paper_count, reverse=True)[:5]
+    authors = sorted(authors, key=lambda x: x.paper_count, reverse=True)
+    for author in authors:
+        author.name = author.name.title()
 
-    search_results = retrieve_results_1(query, author_names=author_names, years=years)
+    search_results = retrieve_results_1(query, author_names=author_names, years=years, n=12)
+
 
     return render_template('search.html',
                            query=query,
@@ -177,7 +183,7 @@ def allowed_file(filename):
 @app.route('/qbe', methods=['POST'])
 def qbe():
     pdf_text = get_pdf_text_simple(request.files.getlist('file'))
-    search_results = retrieve_results_2(pdf_text)
+    search_results = retrieve_results_2(pdf_text, n=12)
     return render_template('search.html',
                            query="QBE",
                            search_results=search_results)
