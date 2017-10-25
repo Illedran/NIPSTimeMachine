@@ -37,11 +37,11 @@
                 <nav>
                     <ul class="nav nav-pills float-right">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/">Home <span
+                            <a class="nav-link {% if request.endpoint == 'index' or request.endpoint == 'search'%}active{% endif %}" href="/">Home <span
                                     class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link {% if request.endpoint == 'authors'%}active{% endif %}"
                                href="/authors">Authors</a>
                         </li>
                         <li class="nav-item">
