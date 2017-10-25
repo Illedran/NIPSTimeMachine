@@ -1,24 +1,21 @@
-# -*- coding: utf-8 -*-
-__author__ = "Guillermo Alonso"
-
 """
+Author: Guillermo Alonso
+
 In this module we will explore author clustering. Note that at first I will
 be reading the data from the ``.csv`` files instead of the sqlite database.
 """
-
-import csv
-import os
-import pickle
-import sys
 from collections import defaultdict
-from math import pi
-
-import gensim
+import os
+import sys
+import csv
 import numpy as np
+import gensim
+import pickle
+import matplotlib.pyplot as plt
+
+from math import pi
 from sklearn.cluster import KMeans
 
-MODEL_DIR = 'models'
-DATA_DIR = 'nips-data'
 
 def get_author_texts(paper_authors):
     """
@@ -36,7 +33,7 @@ def get_author_texts(paper_authors):
     """
     texts = defaultdict(lambda: [])
 
-    with open(os.path.join(DATA_DIR, 'papers.csv')) as csv_file:
+    with open('./nips-data/papers.csv', 'r') as csv_file:
         papers = csv.DictReader(csv_file)
         # Get paper-year allocation
         for paper in papers:
@@ -91,6 +88,7 @@ def calculate_angle_of_author(author_id, author_names, list_of_lists):
         author_name = author_id
         string_key = author_names[author_id]
         int_key = int(string_key)
+
     print('Calculating similar authors to:', author_name)
     a, b, c = None, None, None
     L = []
@@ -113,6 +111,15 @@ def calculate_angle_of_author(author_id, author_names, list_of_lists):
     return sorted(L, key=lambda x: x[1])
 
 
+
+
+
+
+
+
+
+
+
 def get_similar_authors(author_number):
     # Key: author id. Value: Author name
     author_names = {}
@@ -124,14 +131,14 @@ def get_similar_authors(author_number):
     paper_authors = defaultdict(lambda: [])
 
     # Fill the author_names dictionary
-    with open(os.path.join(DATA_DIR, 'authors.csv')) as csv_file:
+    with open('./nips-data/authors.csv', 'r') as csv_file:
         auth_reader = csv.DictReader(csv_file, delimiter=',')
         for author in auth_reader:
             author_names[author['id']] = author['name']
             author_names[author['name']] = author['id']
 
     # Fill the author_papers dictionary
-    with open(os.path.join(DATA_DIR, 'paper_authors.csv')) as csv_file:
+    with open('./nips-data/paper_authors.csv', 'r') as csv_file:
         paper_reader = csv.DictReader(csv_file, delimiter=',')
         for paper in paper_reader:
             author_papers[paper['author_id']].append(paper['paper_id'])
@@ -144,7 +151,8 @@ def get_similar_authors(author_number):
     print('The minimum number of papers by an author is:', min(paper_lengths))
     print('The maximum number of papers by an author is:', max(paper_lengths))
     print('The average number of papers of the authors is:',
-          sum(paper_lengths) / len(paper_lengths))
+        sum(paper_lengths)/len(paper_lengths))
+
 
     # Construct a ndarray. For that, we need a list of lists, so that each sublists
     # represent the information of each author (as of now, only the number of
@@ -163,34 +171,46 @@ def get_similar_authors(author_number):
 
     unique, counts = np.unique(kmeans.labels_, return_counts=True)
     print('Number of authors belonging to each cluster:',
-          dict(zip(unique, counts)))
+        dict(zip(unique, counts)))
+
+
 
     _author_texts = get_author_texts(paper_authors)
 
     # Load the model
-    if not os.path.isfile(os.path.join(MODEL_DIR, 'topics.dict')) \
-            or not os.path.isfile(os.path.join(MODEL_DIR, 'topics.lda')):
+    if not os.path.isfile('./models/topics.dict') or not os.path.isfile('./models/topics.lda'):
         sys.exit('Could not find model files (topics.dict and topics.lda)')
 
-    dictionary = gensim.corpora.Dictionary.load(os.path.join(MODEL_DIR, 'topics.dict'))
-    lda = gensim.models.ldamodel.LdaModel.load(os.path.join(MODEL_DIR, 'topics.lda'))
+    dictionary = gensim.corpora.Dictionary.load('./models/topics.dict')
+    lda = gensim.models.ldamodel.LdaModel.load('./models/topics.lda')
     print('Model loaded successfully')
 
+    our_topics = lda.print_topics(num_topics=-1, num_words=6)
+    for row in our_topics:
+        print(row)
+
     # If the author distributions is not present, we need to create it
-    if not os.path.isfile(os.path.join(MODEL_DIR, 'author_distributions.pickle')):
+    if not os.path.isfile('./models/author_distributions.pickle'):
         author_distributions = {}
 
         for author, author_texts in _author_texts.items():
             query = dictionary.doc2bow(' '.join(author_texts).lower().split())
             author_distributions[author] = lda[query]
 
-        print('Finished generating the distributions',
-              len(author_distributions))
-        with open(os.path.join(MODEL_DIR, 'author_distributions.pickle'), 'wb') as handle:
-            pickle.dump(author_distributions, handle,
-                        protocol=pickle.HIGHEST_PROTOCOL)
+        print('Finished generating the distributions', len(author_distributions))
+        with open('./models/author_distributions.pickle', 'wb') as handle:
+            pickle.dump(author_distributions, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open(os.path.join(MODEL_DIR, 'author_distributions.pickle'), 'rb') as handle:
+
+
+
+
+
+
+
+
+
+    with open('./models/author_distributions.pickle', 'rb') as handle:
         author_distributions = pickle.load(handle)
 
     print('Length of author distribution:', len(author_distributions))
@@ -218,15 +238,34 @@ def get_similar_authors(author_number):
     for i in range(len(list_of_lists)):
         list_of_lists[i].append(kmeans.labels_[i])
 
+
+
     # 330 michael jordan
     # 34 the one I was trying
     # 6338 the other michael jordan
-    # author_number = "Michael I. Jordan"
-    print('List of lists info:', type(list_of_lists), len(list_of_lists),
-          list_of_lists[0])
+    #author_number = "Michael I. Jordan"
+    print('List of lists info:', type(list_of_lists), len(list_of_lists), list_of_lists[0])
 
-    similar_authors = calculate_angle_of_author(author_number, author_names,
-                                                list_of_lists)
+    # Get information about the topics
+    for tn in range(10):
+        xas = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for el in list_of_lists:
+            if el[2] == tn:
+                for i in range(10):
+                    xas[i] += el[1][i]
+
+        max_value, correct_pos = -1, -1
+        current_pos = 0
+        for el in xas:
+            if el > max_value:
+                correct_pos = current_pos
+                max_value = el
+            current_pos += 1
+
+        print('For cluster', tn, 'the results were:', xas, '- Corresponding topic:', correct_pos, our_topics[correct_pos])
+
+
+    similar_authors = calculate_angle_of_author(author_number, author_names, list_of_lists)
 
     # Print the results
     print('Showing top 10 results (Author name, angle):')
@@ -235,6 +274,5 @@ def get_similar_authors(author_number):
 
     return similar_authors
 
-
 if __name__ == '__main__':
-    get_similar_authors('Cesare Furlanello')
+    get_similar_authors('Michael I. Jordan')
