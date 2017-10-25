@@ -11,7 +11,7 @@ import json
 from authors import Authors
 from authors import MultipleAuthorsFoundException, NoAuthorsFoundException
 from engine import BasicEngine
-#from qbe import get_pdf_text_simple
+from qbe import get_pdf_text_simple
 from query_extractor import QueryExtractor, Author
 from query_autocomplete import QueryAutocomplete
 
