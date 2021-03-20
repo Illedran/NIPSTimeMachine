@@ -20,7 +20,7 @@ ipython-genutils==0.2.0   # via nbformat, notebook, traitlets
 ipython==6.2.1            # via ipykernel
 itsdangerous==0.24        # via flask
 jedi==0.11.0              # via ipython
-jinja2==2.9.6             # via flask, nbconvert, notebook, pyldavis
+jinja2==2.11.3             # via flask, nbconvert, notebook, pyldavis
 joblib==0.11              # via pyldavis
 jsonschema==2.6.0         # via nbformat
 jupyter-client==5.1.0     # via ipykernel, notebook
