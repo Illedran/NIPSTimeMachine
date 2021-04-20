@@ -47,7 +47,7 @@ pox==0.2.3                # via pathos
 ppft==1.6.4.7.1           # via pathos
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.5.2         # via pexpect, terminado
-py==1.4.34                # via pytest
+py==1.10.0                # via pytest
 pygments==2.2.0           # via ipython, nbconvert
 pyldavis==2.1.1
 pyparsing==2.2.0          # via matplotlib
