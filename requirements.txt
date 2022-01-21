@@ -17,7 +17,7 @@ html5lib==1.0b10          # via bleach
 idna==2.6                 # via requests
 ipykernel==4.6.1          # via notebook
 ipython-genutils==0.2.0   # via nbformat, notebook, traitlets
-ipython==6.2.1            # via ipykernel
+ipython==7.16.3            # via ipykernel
 itsdangerous==0.24        # via flask
 jedi==0.11.0              # via ipython
 jinja2==2.9.6             # via flask, nbconvert, notebook, pyldavis
