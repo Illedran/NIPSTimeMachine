@@ -33,7 +33,7 @@ multiprocess==0.70.5      # via pathos
 nbconvert==5.3.1          # via notebook
 nbformat==4.4.0           # via nbconvert, notebook
 nltk==3.2.5
-notebook==5.2.0
+notebook==6.4.12
 numexpr==2.6.4            # via pyldavis
 numpy==1.13.3
 pandas==0.20.3
