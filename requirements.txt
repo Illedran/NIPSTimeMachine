@@ -28,7 +28,7 @@ jupyter-core==4.3.0       # via jupyter-client, nbconvert, nbformat, notebook
 lxml==4.1.0               # via python-docx
 markupsafe==1.0           # via jinja2
 matplotlib==2.1.0
-mistune==0.7.4            # via nbconvert
+mistune==2.0.3            # via nbconvert
 multiprocess==0.70.5      # via pathos
 nbconvert==5.3.1          # via notebook
 nbformat==4.4.0           # via nbconvert, notebook
