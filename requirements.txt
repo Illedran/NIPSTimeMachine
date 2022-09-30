@@ -21,7 +21,7 @@ ipython==6.2.1            # via ipykernel
 itsdangerous==0.24        # via flask
 jedi==0.11.0              # via ipython
 jinja2==2.9.6             # via flask, nbconvert, notebook, pyldavis
-joblib==0.11              # via pyldavis
+joblib==1.2.0              # via pyldavis
 jsonschema==2.6.0         # via nbformat
 jupyter-client==5.1.0     # via ipykernel, notebook
 jupyter-core==4.3.0       # via jupyter-client, nbconvert, nbformat, notebook
