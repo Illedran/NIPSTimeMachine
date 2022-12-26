@@ -73,5 +73,5 @@ urllib3==1.22             # via requests
 wcwidth==0.1.7            # via prompt-toolkit
 webencodings==0.5.1       # via html5lib
 werkzeug==0.12.2          # via flask
-wheel==0.30.0             # via pyldavis
+wheel==0.38.1             # via pyldavis
 whoosh==2.7.4
